@@ -49,6 +49,7 @@ model Driver {
   userId          Int?     @unique
   user            User?    @relation(fields: [userId], references: [id])
   documents       DriverDocument[]
+  emergencyReports EmergencyReport[]
 }
 
 model Trip {
@@ -73,6 +74,7 @@ model Trip {
   fuelLogs        FuelLog[]
   expenses        Expense[]
   events          TripEvent[]
+  emergencyReports EmergencyReport[]
 }
 
 model MaintenanceLog {

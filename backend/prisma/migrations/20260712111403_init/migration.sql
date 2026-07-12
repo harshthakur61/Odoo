@@ -1,0 +1,11 @@
+-- CreateTable
+CREATE TABLE "EmergencyReport" (
+    "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    "tripId" INTEGER NOT NULL,
+    "driverId" INTEGER NOT NULL,
+    "message" TEXT NOT NULL,
+    "status" TEXT NOT NULL DEFAULT 'PENDING',
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT "EmergencyReport_tripId_fkey" FOREIGN KEY ("tripId") REFERENCES "Trip" ("id") ON DELETE RESTRICT ON UPDATE CASCADE,
+    CONSTRAINT "EmergencyReport_driverId_fkey" FOREIGN KEY ("driverId") REFERENCES "Driver" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
+);
