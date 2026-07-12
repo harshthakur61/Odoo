@@ -11,6 +11,7 @@ const vehiclesRoutes = require('./routes/vehicles');
 const tripsRoutes = require('./routes/trips');
 const documentsRoutes = require('./routes/documents');
 const tripEventsRoutes = require('./routes/tripEvents');
+const emergencyReportsRoutes = require('./routes/emergencyReports');
 const prisma = require('./lib/prisma');
 
 const app = express();
@@ -36,6 +37,7 @@ app.use('/api/vehicles', vehiclesRoutes);
 app.use('/api/trips', tripsRoutes);
 app.use('/api/documents', documentsRoutes);
 app.use('/api/trips/:tripId/events', tripEventsRoutes);
+app.use('/api/emergency-reports', emergencyReportsRoutes);
 
 // Fallback error handler
 app.use((err, req, res, next) => {

@@ -1,215 +1,143 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
+import { useAuth } from '../context/AuthContext';
+
+const API_BASE = 'http://localhost:5000';
 
 const Reports = () => {
+  const { user } = useAuth();
+  const [reports, setReports] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  const fetchReports = async () => {
+    try {
+      setLoading(true);
+      setError('');
+      const res = await axios.get(`${API_BASE}/api/emergency-reports`);
+      setReports(res.data || []);
+    } catch (e) {
+      setError(e.response?.data?.error || 'Failed to load emergency reports');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const updateReportStatus = async (reportId, newStatus) => {
+    try {
+      await axios.put(`${API_BASE}/api/emergency-reports/${reportId}/status`, { status: newStatus });
+      await fetchReports();
+    } catch (e) {
+      alert('Failed to update status: ' + (e.response?.data?.error || 'Unknown error'));
+    }
+  };
+
+  useEffect(() => {
+    if (user) fetchReports();
+  }, [user]);
+
+  const getStatusBadgeClass = (status) => {
+    switch (status) {
+      case 'PENDING':
+        return 'bg-red-100 text-red-800';
+      case 'REVIEWED':
+        return 'bg-yellow-100 text-yellow-800';
+      case 'RESOLVED':
+        return 'bg-green-100 text-green-800';
+      default:
+        return 'bg-gray-100 text-gray-800';
+    }
+  };
+
   return (
-    <div className="flex-1 overflow-y-auto">
-      <div className="flex justify-between items-end mb-lg">
+    <div className="space-y-lg">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-md mb-lg">
         <div>
-          <h2 className="font-display text-display text-on-surface">Reports</h2>
-          <p className="text-on-surface-variant font-body-md mt-1">Real-time performance metrics for Regional Depot A</p>
+          <h2 className="font-headline-lg text-headline-lg text-on-surface">Emergency Reports</h2>
+          <p className="text-body-md text-on-surface-variant mt-1">Review and manage emergency reports from drivers</p>
         </div>
-        <div className="relative group">
-          <button className="flex items-center gap-sm px-lg py-2 border border-outline-variant bg-white rounded-lg font-label-md text-on-surface hover:bg-surface-container-low transition-colors">
-            <span>Export data</span>
-            <span className="material-symbols-outlined text-[18px]">expand_more</span>
-          </button>
-        </div>
+        <button
+          onClick={fetchReports}
+          className="bg-primary text-white px-lg py-md rounded-lg font-label-md flex items-center gap-sm hover:brightness-110 active:scale-95 transition-all shadow-sm"
+        >
+          <span className="material-symbols-outlined">refresh</span>
+          Refresh
+        </button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-lg h-full max-h-[1200px]">
-        {/* 1. Fuel Efficiency */}
-        <section className="bg-white border border-outline-variant rounded-lg p-md flex flex-col">
-          <div className="mb-md">
-            <h3 className="font-headline-md text-headline-md text-on-surface">Fuel efficiency</h3>
-            <p className="text-on-surface-variant text-body-md">Comparison of average fuel consumption per kilometer across the fleet.</p>
-          </div>
-          <div className="flex-1 flex flex-col justify-end min-h-[300px] pt-md relative chart-container">
-            <div className="flex items-end gap-md h-full px-lg border-b border-outline-variant pb-base ml-8">
-              <div className="flex-1 flex flex-col items-center group/bar relative h-full justify-end">
-                <div className="w-full bg-primary/20 rounded-t-sm chart-bar relative transition-all duration-500 hover:opacity-80" style={{ height: '65%' }}>
-                  <div className="absolute inset-0 bg-primary opacity-0 hover:opacity-100 transition-opacity rounded-t-sm"></div>
-                </div>
-                <span className="mt-sm font-label-sm text-on-surface-variant">V-102</span>
-              </div>
-              <div className="flex-1 flex flex-col items-center group/bar relative h-full justify-end">
-                <div className="w-full bg-primary/20 rounded-t-sm chart-bar relative transition-all duration-500 hover:opacity-80" style={{ height: '85%' }}>
-                  <div className="absolute inset-0 bg-primary opacity-0 hover:opacity-100 transition-opacity rounded-t-sm"></div>
-                </div>
-                <span className="mt-sm font-label-sm text-on-surface-variant">V-105</span>
-              </div>
-              <div className="flex-1 flex flex-col items-center group/bar relative h-full justify-end">
-                <div className="w-full bg-primary/20 rounded-t-sm chart-bar relative transition-all duration-500 hover:opacity-80" style={{ height: '45%' }}>
-                  <div className="absolute inset-0 bg-primary opacity-0 hover:opacity-100 transition-opacity rounded-t-sm"></div>
-                </div>
-                <span className="mt-sm font-label-sm text-on-surface-variant">V-201</span>
-              </div>
-              <div className="flex-1 flex flex-col items-center group/bar relative h-full justify-end">
-                <div className="w-full bg-primary/20 rounded-t-sm chart-bar relative transition-all duration-500 hover:opacity-80" style={{ height: '92%' }}>
-                  <div className="absolute inset-0 bg-primary opacity-0 hover:opacity-100 transition-opacity rounded-t-sm"></div>
-                </div>
-                <span className="mt-sm font-label-sm text-on-surface-variant">V-204</span>
-              </div>
-              <div className="flex-1 flex flex-col items-center group/bar relative h-full justify-end">
-                <div className="w-full bg-primary/20 rounded-t-sm chart-bar relative transition-all duration-500 hover:opacity-80" style={{ height: '70%' }}>
-                  <div className="absolute inset-0 bg-primary opacity-0 hover:opacity-100 transition-opacity rounded-t-sm"></div>
-                </div>
-                <span className="mt-sm font-label-sm text-on-surface-variant">V-302</span>
-              </div>
-            </div>
-            <div className="absolute left-0 top-0 bottom-10 flex flex-col justify-between py-md pointer-events-none">
-              <span className="text-label-sm text-on-surface-variant">12.0</span>
-              <span className="text-label-sm text-on-surface-variant">6.0</span>
-              <span className="text-label-sm text-on-surface-variant">0.0</span>
-            </div>
-          </div>
-        </section>
+      {error && (
+        <div className="p-md bg-error/5 border border-error/20 rounded-lg text-body-md text-error">
+          {error}
+        </div>
+      )}
 
-        {/* 2. Fleet Utilization */}
-        <section className="bg-white border border-outline-variant rounded-lg p-md flex flex-col">
-          <div className="mb-md">
-            <h3 className="font-headline-md text-headline-md text-on-surface">Fleet utilization</h3>
-            <p className="text-on-surface-variant text-body-md">Current operational status across all registered vehicles.</p>
-          </div>
-          <div className="flex-1 flex items-center justify-center min-h-[300px]">
-            <div className="relative w-48 h-48">
-              <svg className="w-full h-full -rotate-90" viewBox="0 0 36 36">
-                <circle cx="18" cy="18" fill="transparent" r="15.915" stroke="#f1f5f9" strokeWidth="3"></circle>
-                <circle cx="18" cy="18" fill="transparent" r="15.915" stroke="#006a61" strokeDasharray="45 100" strokeWidth="3"></circle>
-                <circle cx="18" cy="18" fill="transparent" r="15.915" stroke="#565e74" strokeDasharray="30 100" strokeDashoffset="-45" strokeWidth="3"></circle>
-                <circle cx="18" cy="18" fill="transparent" r="15.915" stroke="#ffdad6" strokeDasharray="15 100" strokeDashoffset="-75" strokeWidth="3"></circle>
-                <circle cx="18" cy="18" fill="transparent" r="15.915" stroke="#e0e3e5" strokeDasharray="10 100" strokeDashoffset="-90" strokeWidth="3"></circle>
-              </svg>
-              <div className="absolute inset-0 flex flex-col items-center justify-center">
-                <span className="text-headline-lg font-bold">84%</span>
-                <span className="text-label-sm text-on-surface-variant">Active</span>
+      {loading ? (
+        <div className="text-center py-xl text-body-md text-secondary">Loading reports...</div>
+      ) : reports.length === 0 ? (
+        <div className="text-center py-xl bg-surface-container-lowest border border-outline-variant rounded-lg">
+          <span className="material-symbols-outlined text-[48px] text-secondary mb-4 block">check_circle</span>
+          <h3 className="font-headline-md text-headline-md text-on-surface mb-2">No emergency reports</h3>
+          <p className="text-body-md text-on-surface-variant">Great! There are no active emergency reports at the moment.</p>
+        </div>
+      ) : (
+        <div className="space-y-md">
+          {reports.map((report) => (
+            <div
+              key={report.id}
+              className="bg-surface-container-lowest border border-outline-variant rounded-lg p-md shadow-sm"
+            >
+              <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-md mb-md">
+                <div>
+                  <div className="flex items-center gap-sm mb-sm">
+                    <span className="material-symbols-outlined text-red-500">emergency</span>
+                    <span className="font-headline-md text-headline-md text-on-surface">
+                      Trip {report.tripId} - {report.driver?.name || 'Unknown Driver'}
+                    </span>
+                  </div>
+                  <p className="text-label-sm text-secondary">
+                    {new Date(report.createdAt).toLocaleString()}
+                  </p>
+                </div>
+                <div className="flex items-center gap-sm">
+                  <span className={`px-2 py-1 rounded-full text-label-sm font-bold ${getStatusBadgeClass(report.status)}`}>
+                    {report.status}
+                  </span>
+                  {report.status !== 'RESOLVED' && (
+                    <select
+                      className="border border-outline-variant rounded-lg px-2 py-1 text-label-sm"
+                      value={report.status}
+                      onChange={(e) => updateReportStatus(report.id, e.target.value)}
+                    >
+                      <option value="PENDING">Pending</option>
+                      <option value="REVIEWED">Reviewed</option>
+                      <option value="RESOLVED">Resolved</option>
+                    </select>
+                  )}
+                </div>
               </div>
-            </div>
-            <div className="ml-lg space-y-sm">
-              <div className="flex items-center gap-sm">
-                <span className="w-3 h-3 rounded-full bg-primary"></span>
-                <span className="text-label-md">Available (45%)</span>
-              </div>
-              <div className="flex items-center gap-sm">
-                <span className="w-3 h-3 rounded-full bg-secondary"></span>
-                <span className="text-label-md">On Trip (30%)</span>
-              </div>
-              <div className="flex items-center gap-sm">
-                <span className="w-3 h-3 rounded-full bg-error-container"></span>
-                <span className="text-label-md">In Shop (15%)</span>
-              </div>
-              <div className="flex items-center gap-sm">
-                <span className="w-3 h-3 rounded-full bg-surface-variant"></span>
-                <span className="text-label-md">Retired (10%)</span>
-              </div>
-            </div>
-          </div>
-        </section>
 
-        {/* 3. Operational Cost */}
-        <section className="bg-white border border-outline-variant rounded-lg p-md flex flex-col">
-          <div className="mb-md">
-            <h3 className="font-headline-md text-headline-md text-on-surface">Operational cost</h3>
-            <p className="text-on-surface-variant text-body-md">Breakdown of total operational expenditures for top vehicles.</p>
-          </div>
-          <div className="flex-1 flex flex-col justify-end min-h-[300px] pt-md px-lg">
-            <div className="flex items-end gap-lg h-full border-b border-outline-variant pb-base">
-              <div className="flex-1 flex flex-col group/stack">
-                <div className="w-full flex flex-col-reverse h-[240px]">
-                  <div className="bg-primary h-[50%] w-full rounded-t-sm" title="Fuel: $1,200"></div>
-                  <div className="bg-secondary h-[30%] w-full" title="Maintenance: $700"></div>
-                  <div className="bg-tertiary-container h-[20%] w-full" title="Other: $450"></div>
+              <div className="space-y-sm border-t border-outline-variant pt-md">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-sm">
+                  <div>
+                    <p className="text-label-sm font-bold text-secondary">Vehicle</p>
+                    <p className="text-body-md text-on-surface">{report.trip?.vehicle?.regNumber || '-'}</p>
+                  </div>
+                  <div>
+                    <p className="text-label-sm font-bold text-secondary">Route</p>
+                    <p className="text-body-md text-on-surface">{report.trip?.source} → {report.trip?.destination}</p>
+                  </div>
                 </div>
-                <span className="mt-sm text-center font-label-sm text-on-surface-variant">V-102</span>
-              </div>
-              <div className="flex-1 flex flex-col group/stack">
-                <div className="w-full flex flex-col-reverse h-[240px]">
-                  <div className="bg-primary h-[40%] w-full rounded-t-sm"></div>
-                  <div className="bg-secondary h-[45%] w-full"></div>
-                  <div className="bg-tertiary-container h-[15%] w-full"></div>
+                <div>
+                  <p className="text-label-sm font-bold text-secondary mb-sm">Details</p>
+                  <p className="text-body-md text-on-surface p-md bg-surface-container rounded-lg">
+                    {report.message}
+                  </p>
                 </div>
-                <span className="mt-sm text-center font-label-sm text-on-surface-variant">V-105</span>
-              </div>
-              <div className="flex-1 flex flex-col group/stack items-center justify-center border-x border-dashed border-outline-variant h-[240px] bg-background/50">
-                <span className="text-label-sm text-on-surface-variant text-center px-1">No data available</span>
-              </div>
-              <div className="flex-1 flex flex-col group/stack">
-                <div className="w-full flex flex-col-reverse h-[240px]">
-                  <div className="bg-primary h-[60%] w-full rounded-t-sm"></div>
-                  <div className="bg-secondary h-[20%] w-full"></div>
-                  <div className="bg-tertiary-container h-[20%] w-full"></div>
-                </div>
-                <span className="mt-sm text-center font-label-sm text-on-surface-variant">V-204</span>
               </div>
             </div>
-            <div className="flex justify-center gap-lg mt-md">
-              <div className="flex items-center gap-xs"><span className="w-2 h-2 bg-primary rounded-full"></span><span className="text-label-sm">Fuel</span></div>
-              <div className="flex items-center gap-xs"><span className="w-2 h-2 bg-secondary rounded-full"></span><span className="text-label-sm">Maintenance</span></div>
-              <div className="flex items-center gap-xs"><span className="w-2 h-2 bg-tertiary-container rounded-full"></span><span className="text-label-sm">Other</span></div>
-            </div>
-          </div>
-        </section>
-
-        {/* 4. Vehicle ROI */}
-        <section className="bg-white border border-outline-variant rounded-lg p-md flex flex-col relative overflow-hidden">
-          <div className="mb-md">
-            <div className="flex justify-between items-start">
-              <h3 className="font-headline-md text-headline-md text-on-surface">Vehicle ROI</h3>
-              <div className="flex items-center gap-xs px-2 py-0.5 bg-surface-container rounded border border-outline-variant">
-                <span className="material-symbols-outlined text-[14px] text-on-surface-variant">info</span>
-                <span className="text-label-sm text-on-surface-variant">Revenue not tracked</span>
-              </div>
-            </div>
-            <p className="text-on-surface-variant text-body-md mt-1">Comparison of total operational investment per vehicle.</p>
-          </div>
-          <div className="flex-1 flex flex-col gap-sm pt-md">
-            <div className="flex flex-col gap-1">
-              <div className="flex justify-between text-label-sm">
-                <span className="font-bold">Heavy Hauler V-102</span>
-                <span className="text-on-surface-variant">$24,200</span>
-              </div>
-              <div className="w-full h-2 bg-surface-container rounded-full overflow-hidden">
-                <div className="h-full bg-primary w-[75%] rounded-full"></div>
-              </div>
-            </div>
-            <div className="flex flex-col gap-1">
-              <div className="flex justify-between text-label-sm">
-                <span className="font-bold">Transit Van V-105</span>
-                <span className="text-on-surface-variant">$18,450</span>
-              </div>
-              <div className="w-full h-2 bg-surface-container rounded-full overflow-hidden">
-                <div className="h-full bg-primary w-[60%] rounded-full"></div>
-              </div>
-            </div>
-            <div className="flex flex-col gap-1">
-              <div className="flex justify-between text-label-sm">
-                <span className="font-bold">Light Cargo V-201</span>
-                <span className="text-on-surface-variant">$12,100</span>
-              </div>
-              <div className="w-full h-2 bg-surface-container rounded-full overflow-hidden">
-                <div className="h-full bg-primary w-[45%] rounded-full"></div>
-              </div>
-            </div>
-            <div className="flex flex-col gap-1">
-              <div className="flex justify-between text-label-sm">
-                <span className="font-bold">Regional Bus V-204</span>
-                <span className="text-on-surface-variant">$31,000</span>
-              </div>
-              <div className="w-full h-2 bg-surface-container rounded-full overflow-hidden">
-                <div className="h-full bg-primary w-[90%] rounded-full"></div>
-              </div>
-            </div>
-            <div className="flex flex-col gap-1">
-              <div className="flex justify-between text-label-sm">
-                <span className="font-bold">Courier Van V-302</span>
-                <span className="text-on-surface-variant">$9,800</span>
-              </div>
-              <div className="w-full h-2 bg-surface-container rounded-full overflow-hidden">
-                <div className="h-full bg-primary w-[35%] rounded-full"></div>
-              </div>
-            </div>
-          </div>
-        </section>
-      </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 };

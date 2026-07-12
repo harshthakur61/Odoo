@@ -164,3 +164,14 @@ model TripEvent {
   createdByUserId Int?
   createdByUser   User?        @relation(fields: [createdByUserId], references: [id])
 }
+
+model EmergencyReport {
+  id        Int       @id @default(autoincrement())
+  tripId    Int
+  trip      Trip      @relation(fields: [tripId], references: [id])
+  driverId  Int
+  driver    Driver    @relation(fields: [driverId], references: [id])
+  message   String
+  status    String    @default("PENDING") // PENDING, REVIEWED, RESOLVED
+  createdAt DateTime  @default(now())
+}
