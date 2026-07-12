@@ -68,7 +68,7 @@ const ensureDemoData = async () => {
     { email: 'admin@transitops.com', name: 'Admin User', role: 'Fleet Manager' },
     { email: 'dispatcher@transitops.com', name: 'Mark Reynolds', role: 'Dispatcher' },
     { email: 'field@transitops.com', name: 'Elena Rodriguez', role: 'Driver' },
-    { email: 'akashthakre1320@gmail.com', name: 'Akash Thakur', role: 'Driver' },
+    { email: 'phantomking176@gmail.com', name: 'Akash Thakur', role: 'Driver' },
     { email: 'safety@transitops.com', name: 'Sarah Chen', role: 'Safety Officer' },
     { email: 'finance@transitops.com', name: 'James Wright', role: 'Financial Analyst' },
   ];

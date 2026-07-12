@@ -122,7 +122,7 @@ const Login = () => {
                 </button>
                 <button 
                   type="button" 
-                  onClick={() => { setEmail('akashthakre1320@gmail.com'); setPassword('demo'); }}
+                  onClick={() => { setEmail('phantomking176@gmail.com'); setPassword('demo'); }}
                   className="px-3 py-1 bg-surface-container-low border border-outline-variant rounded text-label-sm hover:bg-surface-container transition-colors"
                 >
                   Akash Thakur

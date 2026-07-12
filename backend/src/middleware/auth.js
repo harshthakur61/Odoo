@@ -6,7 +6,7 @@ const DEMO_USERS = {
   'admin@transitops.com': { name: 'Admin User', email: 'admin@transitops.com', role: 'Fleet Manager' },
   'dispatcher@transitops.com': { name: 'Mark Reynolds', email: 'dispatcher@transitops.com', role: 'Dispatcher' },
   'field@transitops.com': { name: 'Elena Rodriguez', email: 'field@transitops.com', role: 'Driver' },
-  'akashthakre1320@gmail.com': { name: 'Akash Thakur', email: 'akashthakre1320@gmail.com', role: 'Driver' },
+  'phantomking176@gmail.com': { name: 'Akash Thakur', email: 'phantomking176@gmail.com', role: 'Driver' },
   'safety@transitops.com': { name: 'Sarah Chen', email: 'safety@transitops.com', role: 'Safety Officer' },
   'finance@transitops.com': { name: 'James Wright', email: 'finance@transitops.com', role: 'Financial Analyst' },
 };
