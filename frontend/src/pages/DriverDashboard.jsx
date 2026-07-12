@@ -1,5 +1,8 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
+import axios from 'axios';
+
+const API_BASE = 'http://localhost:5000';
 
 const tripFlow = [
   'Assigned',
@@ -24,6 +27,10 @@ const mockTrip = {
 
 const DriverDashboard = () => {
   const { user } = useAuth();
+  const [activeTrip, setActiveTrip] = useState(null);
+  const [note, setNote] = useState('');
+  const [noteError, setNoteError] = useState('');
+  const [noteSending, setNoteSending] = useState(false);
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const [showIssueModal, setShowIssueModal] = useState(false);
   const [issueDesc, setIssueDesc] = useState('');
@@ -55,8 +62,81 @@ const DriverDashboard = () => {
     setCurrentStepIndex(tripFlow.length); // sentinel for "declined"
   };
 
+  useEffect(() => {
+    if (user?.role !== 'Driver') return;
+    (async () => {
+      try {
+        const res = await axios.get(`${API_BASE}/api/trips`);
+        const trips = res.data || [];
+        const dispatched = trips.find((t) => t.status === 'DISPATCHED') || null;
+        setActiveTrip(dispatched);
+      } catch (e) {
+        setActiveTrip(null);
+      }
+    })();
+  }, [user?.role]);
+
+  const postNote = async () => {
+    if (!activeTrip) return;
+    const msg = note.trim();
+    if (!msg) return;
+    try {
+      setNoteSending(true);
+      setNoteError('');
+      await axios.post(`${API_BASE}/api/trips/${activeTrip.id}/events`, { message: msg });
+      setNote('');
+    } catch (e) {
+      setNoteError(e.response?.data?.error || 'Failed to post note');
+    } finally {
+      setNoteSending(false);
+    }
+  };
+
   return (
     <div className="w-full max-w-4xl mx-auto space-y-lg">
+      {user?.role === 'Driver' && (
+        <div className="bg-surface-container-lowest border border-outline-variant rounded-xl p-lg shadow-sm">
+          <div className="flex items-start justify-between gap-md">
+            <div>
+              <h3 className="font-headline-md text-headline-md font-bold text-on-surface">Driver Updates</h3>
+              <p className="text-body-md text-secondary mt-1">Post real-time notes to the dispatcher timeline for your dispatched trip.</p>
+            </div>
+            {activeTrip && (
+              <div className="px-3 py-1 bg-primary/10 text-primary rounded-full text-label-sm font-bold border border-primary/20">
+                TRP-{String(activeTrip.id).padStart(4, '0')}
+              </div>
+            )}
+          </div>
+
+          {!activeTrip ? (
+            <div className="mt-md text-body-md text-secondary">No dispatched trips found for your account.</div>
+          ) : (
+            <div className="mt-md">
+              {noteError && (
+                <div className="mb-md p-md bg-error/5 border border-error/20 rounded-lg text-body-md text-error">
+                  {noteError}
+                </div>
+              )}
+              <div className="flex gap-2">
+                <input
+                  className="flex-1 border border-outline-variant rounded-lg p-2.5 text-body-md"
+                  placeholder="e.g. Delayed by traffic, reached checkpoint, etc."
+                  value={note}
+                  onChange={(e) => setNote(e.target.value)}
+                />
+                <button
+                  className="bg-primary text-white px-4 py-2 rounded-lg font-label-md hover:brightness-110 disabled:opacity-60"
+                  type="button"
+                  onClick={postNote}
+                  disabled={noteSending || !note.trim()}
+                >
+                  {noteSending ? 'Sending...' : 'Send'}
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* No Active Trip */}
       {(isDeclined || status === 'Trip Closed') ? (

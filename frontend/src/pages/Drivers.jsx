@@ -1,4 +1,8 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
+import axios from 'axios';
+import { useAuth } from '../context/AuthContext';
+
+const API_BASE = 'http://localhost:5000';
 
 const mockDrivers = [
   { id: 1, name: 'Marcus Thorne', licenseNumber: 'DL-992341', licenseCategory: 'Class A CDL', licenseExpiry: '2023-10-12', contact: '+1 (555) 012-4432', safetyScore: 94, status: 'EXPIRED', avatar: 'https://lh3.googleusercontent.com/aida-public/AB6AXuA0hqPeMFP3900ZfAKHNbnXhs4LmTijns48KYMfiNwnAIKoHlJXN2LmPhorhB3W9oLMjZu1sKrTetSH-6-V2ySoL-te7FJhnzD2bcZy5GePvqjpKHsQhrxgiotyGdgw3L2UZ26U1Tb8Xn_JtBVOfISOgMm7Nm_5cM2I3-7AcjL5OQnRC6ieOla12t66AILTyPZARncGLqZNHHzZZ2-_AD-jHh1GySNtPuTehNhmMwJz6JcONp5_taw' },
@@ -32,10 +36,79 @@ const formatDate = (dateStr) => {
 const emptyDriver = { name: '', licenseNumber: '', licenseCategory: 'Class A CDL', licenseExpiry: '', contact: '', safetyScore: 85, status: 'ACTIVE' };
 
 const Drivers = () => {
+  const { hasRole } = useAuth();
   const [drivers, setDrivers] = useState(mockDrivers);
   const [statusFilter, setStatusFilter] = useState('all');
   const [showModal, setShowModal] = useState(false);
   const [newDriver, setNewDriver] = useState({ ...emptyDriver });
+  const [reviewDriver, setReviewDriver] = useState(null);
+  const [reviewDocs, setReviewDocs] = useState([]);
+  const [reviewLoading, setReviewLoading] = useState(false);
+  const [reviewError, setReviewError] = useState('');
+  const [rejectDocId, setRejectDocId] = useState(null);
+  const [rejectReason, setRejectReason] = useState('');
+
+  const docStatusConfig = useMemo(() => ({
+    PENDING: { label: 'Pending', bg: 'bg-amber-100', text: 'text-amber-700', border: 'border-amber-200' },
+    VERIFIED: { label: 'Verified', bg: 'bg-[#0D9488]/10', text: 'text-[#0D9488]', border: 'border-[#0D9488]/20' },
+    REJECTED: { label: 'Rejected', bg: 'bg-error/10', text: 'text-error', border: 'border-error/20' },
+    EXPIRED: { label: 'Expired', bg: 'bg-error/10', text: 'text-error', border: 'border-error/20' },
+  }), []);
+
+  const loadDriverDocs = async (driverId) => {
+    try {
+      setReviewLoading(true);
+      setReviewError('');
+      const res = await axios.get(`${API_BASE}/api/documents/driver/${driverId}`);
+      setReviewDocs(res.data || []);
+    } catch (e) {
+      setReviewError(e.response?.data?.error || 'Failed to load documents');
+      setReviewDocs([]);
+    } finally {
+      setReviewLoading(false);
+    }
+  };
+
+  const openReview = async (driver) => {
+    setReviewDriver(driver);
+    setRejectDocId(null);
+    setRejectReason('');
+    await loadDriverDocs(driver.id);
+  };
+
+  const closeReview = () => {
+    setReviewDriver(null);
+    setReviewDocs([]);
+    setReviewError('');
+    setRejectDocId(null);
+    setRejectReason('');
+  };
+
+  const verifyDoc = async (docId) => {
+    try {
+      await axios.put(`${API_BASE}/api/documents/${docId}/verify`);
+      if (reviewDriver) await loadDriverDocs(reviewDriver.id);
+    } catch (e) {
+      setReviewError(e.response?.data?.error || 'Failed to verify document');
+    }
+  };
+
+  const rejectDoc = async () => {
+    if (!rejectDocId) return;
+    const reason = rejectReason.trim();
+    if (!reason) {
+      setReviewError('Rejection reason is required');
+      return;
+    }
+    try {
+      await axios.put(`${API_BASE}/api/documents/${rejectDocId}/reject`, { rejectionReason: reason });
+      setRejectDocId(null);
+      setRejectReason('');
+      if (reviewDriver) await loadDriverDocs(reviewDriver.id);
+    } catch (e) {
+      setReviewError(e.response?.data?.error || 'Failed to reject document');
+    }
+  };
 
   const filteredDrivers = drivers.filter(d => {
     if (statusFilter !== 'all' && d.status !== statusFilter) return false;
@@ -139,7 +212,18 @@ const Drivers = () => {
                       </span>
                     </td>
                     <td className="px-md py-4 text-right">
-                      <button className="material-symbols-outlined text-secondary hover:text-error transition-colors p-1" title="Suspend">block</button>
+                      <div className="flex items-center justify-end gap-2">
+                        {hasRole('Fleet Manager') && (
+                          <button
+                            className="px-3 py-1 border border-outline-variant rounded hover:bg-surface-container transition-colors text-label-md"
+                            onClick={(e) => { e.stopPropagation(); openReview(driver); }}
+                            type="button"
+                          >
+                            Review Docs
+                          </button>
+                        )}
+                        <button className="material-symbols-outlined text-secondary hover:text-error transition-colors p-1" title="Suspend" type="button">block</button>
+                      </div>
                     </td>
                   </tr>
                 );
@@ -224,6 +308,120 @@ const Drivers = () => {
                 <button className="px-6 py-2 bg-[#0D9488] text-white font-semibold rounded-lg text-label-md hover:bg-opacity-90 transition-all shadow-sm" type="submit">Create driver profile</button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {reviewDriver && (
+        <div className="fixed inset-0 z-[70] flex items-center justify-center p-md">
+          <div className="absolute inset-0 bg-on-surface/40 backdrop-blur-sm" onClick={closeReview}></div>
+          <div className="bg-white rounded-lg border border-outline-variant w-full max-w-3xl relative overflow-hidden">
+            <div className="px-lg py-md border-b border-outline-variant flex justify-between items-center">
+              <div>
+                <h3 className="font-headline-md text-headline-md">Review Documents</h3>
+                <p className="text-body-md text-secondary mt-1">{reviewDriver.name}</p>
+              </div>
+              <button className="material-symbols-outlined text-secondary hover:text-on-surface" onClick={closeReview} type="button">close</button>
+            </div>
+
+            <div className="p-lg space-y-md">
+              {reviewError && (
+                <div className="p-md bg-error/5 border border-error/20 rounded-lg text-body-md text-error">
+                  {reviewError}
+                </div>
+              )}
+
+              {reviewLoading ? (
+                <div className="text-body-md text-secondary">Loading documents...</div>
+              ) : (
+                <div className="border border-outline-variant rounded-lg overflow-hidden">
+                  <div className="bg-surface-container-low px-md py-3 text-label-sm text-secondary font-semibold uppercase tracking-wider">
+                    Uploaded Documents
+                  </div>
+                  <div className="divide-y divide-outline-variant">
+                    {reviewDocs.map((d) => {
+                      const sc = docStatusConfig[d.status] || docStatusConfig.PENDING;
+                      return (
+                        <div key={d.id} className="px-md py-md flex flex-col md:flex-row md:items-center md:justify-between gap-md">
+                          <div className="min-w-0">
+                            <div className="flex items-center gap-3 flex-wrap">
+                              <span className="font-body-md font-semibold text-on-surface">{d.type}</span>
+                              <span className={`${sc.bg} ${sc.text} px-2 py-1 rounded-full text-label-sm font-semibold border ${sc.border}`}>
+                                {sc.label}
+                              </span>
+                              <a
+                                className="text-primary font-semibold text-label-md hover:underline"
+                                href={`${API_BASE}${d.fileUrl}`}
+                                target="_blank"
+                                rel="noreferrer"
+                              >
+                                Preview
+                              </a>
+                            </div>
+                            <div className="text-label-sm text-secondary mt-xs">
+                              Uploaded {d.uploadedAt ? new Date(d.uploadedAt).toLocaleString() : '-'}
+                            </div>
+                            {d.status === 'REJECTED' && d.rejectionReason && (
+                              <div className="text-label-sm text-error mt-xs">
+                                {d.rejectionReason}
+                              </div>
+                            )}
+                          </div>
+
+                          <div className="flex items-center gap-2 justify-end">
+                            <button
+                              className="px-3 py-1 rounded border border-[#0D9488]/30 text-[#0D9488] hover:bg-[#0D9488]/10 transition-colors text-label-md font-semibold"
+                              onClick={() => verifyDoc(d.id)}
+                              type="button"
+                            >
+                              Verify
+                            </button>
+                            <button
+                              className="px-3 py-1 rounded border border-error/30 text-error hover:bg-error/10 transition-colors text-label-md font-semibold"
+                              onClick={() => { setRejectDocId(d.id); setRejectReason(''); setReviewError(''); }}
+                              type="button"
+                            >
+                              Reject
+                            </button>
+                          </div>
+                        </div>
+                      );
+                    })}
+                    {reviewDocs.length === 0 && (
+                      <div className="px-md py-lg text-body-md text-secondary">
+                        No documents uploaded yet.
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {rejectDocId && (
+                <div className="border border-outline-variant rounded-lg p-md">
+                  <div className="flex items-center justify-between gap-md">
+                    <div className="font-body-md font-semibold text-on-surface">Reject reason</div>
+                    <button className="material-symbols-outlined text-secondary hover:text-on-surface" onClick={() => { setRejectDocId(null); setRejectReason(''); }} type="button">close</button>
+                  </div>
+                  <div className="mt-sm grid grid-cols-1 md:grid-cols-4 gap-md items-end">
+                    <div className="md:col-span-3">
+                      <input
+                        className="w-full border border-outline-variant rounded-lg text-body-md focus:ring-[#0D9488] focus:border-[#0D9488] p-2.5"
+                        placeholder="Why is this document rejected?"
+                        value={rejectReason}
+                        onChange={(e) => setRejectReason(e.target.value)}
+                      />
+                    </div>
+                    <button
+                      className="bg-error text-white px-4 py-2 rounded-lg font-label-md hover:bg-opacity-90 transition-all"
+                      onClick={rejectDoc}
+                      type="button"
+                    >
+                      Confirm Reject
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       )}

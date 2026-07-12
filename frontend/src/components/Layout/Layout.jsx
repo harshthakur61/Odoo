@@ -9,11 +9,12 @@ const Layout = () => {
   const mainNavigation = [
     { name: 'Fleet Overview', href: '/dashboard', icon: 'dashboard', roles: ['Fleet Manager', 'Dispatcher', 'Safety Officer', 'Financial Analyst'] },
     { name: 'Vehicle Tracking', href: '/vehicles', icon: 'location_on', roles: ['Fleet Manager', 'Dispatcher', 'Financial Analyst'] },
-    { name: 'Maintenance Logs', href: '/maintenance', icon: 'build', roles: ['Fleet Manager', 'Dispatcher'] },
+    { name: 'Maintenance Logs', href: '/maintenance', icon: 'build', roles: ['Fleet Manager', 'Safety Officer', 'Financial Analyst'] },
     { name: 'Driver Schedules', href: '/drivers', icon: 'calendar_today', roles: ['Fleet Manager', 'Dispatcher', 'Safety Officer'] },
-    { name: 'Trips', href: '/trips', icon: 'route', roles: ['Fleet Manager', 'Dispatcher', 'Safety Officer', 'Financial Analyst'] },
-    { name: 'Fuel & Expenses', href: '/fuel', icon: 'local_gas_station', roles: ['Fleet Manager', 'Financial Analyst'] },
-    { name: 'Analytics', href: '/reports', icon: 'bar_chart', roles: ['Fleet Manager', 'Safety Officer', 'Financial Analyst'] },
+    { name: 'Driver Verification', href: '/driver-verification', icon: 'verified_user', roles: ['Fleet Manager'] },
+    { name: 'Trips', href: '/trips', icon: 'route', roles: ['Dispatcher', 'Safety Officer', 'Financial Analyst'] },
+    { name: 'Fuel & Expenses', href: '/fuel', icon: 'local_gas_station', roles: ['Financial Analyst'] },
+    { name: 'Analytics', href: '/reports', icon: 'bar_chart', roles: ['Safety Officer', 'Financial Analyst'] },
   ];
 
   const driverNavigation = [

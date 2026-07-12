@@ -1,13 +1,8 @@
-import React, { useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
+import axios from 'axios';
+import { useAuth } from '../context/AuthContext';
 
-const mockTrips = [
-  { id: 'TRP-9021', source: 'Depot A (Chicago)', destination: 'Distribution Ctr 4', vehicle: 'Truck-104', driver: 'Marcus Chen', cargo: 12400, distance: 452, status: 'DISPATCHED' },
-  { id: 'TRP-9025', source: 'Depot B (Detroit)', destination: 'Local Retail H3', vehicle: 'Van-22', driver: 'Sarah Jenkins', cargo: 2100, distance: 85, status: 'DRAFT' },
-  { id: 'TRP-9018', source: 'Depot A (Chicago)', destination: 'Airport Cargo T1', vehicle: 'Truck-88', driver: 'Leonid Volkov', cargo: 15000, distance: 32, status: 'COMPLETED' },
-  { id: 'TRP-8999', source: 'Depot C (Austin)', destination: 'Warehouse 12', vehicle: 'Truck-50', driver: 'Emma Watson', cargo: 8200, distance: 120, status: 'CANCELLED' },
-  { id: 'TRP-9022', source: 'Depot B (Detroit)', destination: 'Plant 9 (Toledo)', vehicle: 'Truck-112', driver: 'Oscar G.', cargo: 18500, distance: 95, status: 'DISPATCHED', distanceError: true },
-  { id: 'TRP-9030', source: 'Depot A (Chicago)', destination: 'Distribution Ctr 1', vehicle: 'Van-04', driver: 'Aisha K.', cargo: 1400, distance: 12, status: 'DRAFT' },
-];
+const API_BASE = 'http://localhost:5000';
 
 const statusStyles = {
   DISPATCHED: 'bg-blue-100 text-blue-800',
@@ -17,37 +12,157 @@ const statusStyles = {
 };
 
 const Trips = () => {
-  const [trips, setTrips] = useState(mockTrips);
+  const { user, hasRole } = useAuth();
+  const [trips, setTrips] = useState([]);
+  const [drivers, setDrivers] = useState([]);
+  const [vehicles, setVehicles] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showCompleteModal, setShowCompleteModal] = useState(false);
   const [selectedTrip, setSelectedTrip] = useState(null);
+  const [showTimelineModal, setShowTimelineModal] = useState(false);
+  const [timelineTrip, setTimelineTrip] = useState(null);
+  const [timelineEvents, setTimelineEvents] = useState([]);
+  const [timelineLoading, setTimelineLoading] = useState(false);
+  const [timelineError, setTimelineError] = useState('');
+  const [newNote, setNewNote] = useState('');
 
-  const [newTrip, setNewTrip] = useState({ vehicle: '', driver: '', cargo: '', source: '', destination: '', distance: '' });
+  const [newTrip, setNewTrip] = useState({ vehicleId: '', driverId: '', cargoWeight: '', source: '', destination: '', plannedDistance: '' });
+
+  const formatTripId = (id) => `TRP-${String(id).padStart(4, '0')}`;
+
+  const formatDateTime = (v) => {
+    if (!v) return '-';
+    return new Date(v).toLocaleString();
+  };
+
+  const loadTrips = async () => {
+    const res = await axios.get(`${API_BASE}/api/trips`);
+    setTrips(res.data || []);
+  };
+
+  const loadDrivers = async () => {
+    const res = await axios.get(`${API_BASE}/api/drivers`);
+    setDrivers(res.data || []);
+  };
+
+  const loadVehicles = async () => {
+    const res = await axios.get(`${API_BASE}/api/vehicles`);
+    setVehicles(res.data || []);
+  };
+
+  const refresh = async () => {
+    try {
+      setLoading(true);
+      setError('');
+      await loadTrips();
+      if (hasRole(['Dispatcher', 'Fleet Manager'])) {
+        await Promise.all([loadDrivers(), loadVehicles()]);
+      }
+    } catch (e) {
+      setError(e.response?.data?.error || 'Failed to load trips');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (user) refresh();
+  }, [user?.role]);
+
+  const availableDrivers = useMemo(() => {
+    return drivers.filter((d) => d.status === 'AVAILABLE');
+  }, [drivers]);
+
+  const availableVehicles = useMemo(() => {
+    return vehicles.filter((v) => v.status === 'AVAILABLE');
+  }, [vehicles]);
 
   const handleCreateTrip = (e) => {
     e.preventDefault();
-    setTrips(prev => [{
-      id: `TRP-${Math.floor(1000 + Math.random() * 9000)}`,
-      source: newTrip.source,
-      destination: newTrip.destination,
-      vehicle: newTrip.vehicle,
-      driver: newTrip.driver,
-      cargo: Number(newTrip.cargo),
-      distance: Number(newTrip.distance),
-      status: 'DRAFT'
-    }, ...prev]);
-    setShowCreateModal(false);
-    setNewTrip({ vehicle: '', driver: '', cargo: '', source: '', destination: '', distance: '' });
+    (async () => {
+      try {
+        setError('');
+        await axios.post(`${API_BASE}/api/trips`, {
+          source: newTrip.source,
+          destination: newTrip.destination,
+          cargoWeight: Number(newTrip.cargoWeight),
+          plannedDistance: Number(newTrip.plannedDistance),
+          vehicleId: Number(newTrip.vehicleId),
+          driverId: Number(newTrip.driverId),
+        });
+        setShowCreateModal(false);
+        setNewTrip({ vehicleId: '', driverId: '', cargoWeight: '', source: '', destination: '', plannedDistance: '' });
+        await refresh();
+      } catch (e) {
+        setError(e.response?.data?.error || 'Failed to create trip');
+      }
+    })();
   };
 
   const handleCompleteTrip = (e) => {
     e.preventDefault();
-    setTrips(prev => prev.map(t => t.id === selectedTrip.id ? { ...t, status: 'COMPLETED' } : t));
-    setShowCompleteModal(false);
+    (async () => {
+      try {
+        setError('');
+        await axios.put(`${API_BASE}/api/trips/${selectedTrip.id}/complete`);
+        setShowCompleteModal(false);
+        await refresh();
+      } catch (e) {
+        setError(e.response?.data?.error || 'Failed to complete trip');
+      }
+    })();
   };
 
-  const changeStatus = (id, newStatus) => {
-    setTrips(prev => prev.map(t => t.id === id ? { ...t, status: newStatus } : t));
+  const dispatchTrip = async (trip) => {
+    try {
+      setError('');
+      await axios.put(`${API_BASE}/api/trips/${trip.id}/dispatch`);
+      await refresh();
+    } catch (e) {
+      setError(e.response?.data?.error || 'Failed to dispatch trip');
+    }
+  };
+
+  const cancelTrip = async (trip) => {
+    try {
+      setError('');
+      await axios.put(`${API_BASE}/api/trips/${trip.id}/cancel`);
+      await refresh();
+    } catch (e) {
+      setError(e.response?.data?.error || 'Failed to cancel trip');
+    }
+  };
+
+  const openTimeline = async (trip) => {
+    try {
+      setTimelineTrip(trip);
+      setShowTimelineModal(true);
+      setTimelineLoading(true);
+      setTimelineError('');
+      const res = await axios.get(`${API_BASE}/api/trips/${trip.id}/events`);
+      setTimelineEvents(res.data || []);
+    } catch (e) {
+      setTimelineError(e.response?.data?.error || 'Failed to load timeline');
+      setTimelineEvents([]);
+    } finally {
+      setTimelineLoading(false);
+    }
+  };
+
+  const postNote = async () => {
+    if (!timelineTrip) return;
+    const msg = newNote.trim();
+    if (!msg) return;
+    try {
+      await axios.post(`${API_BASE}/api/trips/${timelineTrip.id}/events`, { message: msg });
+      setNewNote('');
+      const res = await axios.get(`${API_BASE}/api/trips/${timelineTrip.id}/events`);
+      setTimelineEvents(res.data || []);
+    } catch (e) {
+      setTimelineError(e.response?.data?.error || 'Failed to post note');
+    }
   };
 
   return (
@@ -57,13 +172,16 @@ const Trips = () => {
           <h1 className="font-headline-lg text-headline-lg text-on-surface">Trips</h1>
           <p className="text-body-md text-on-surface-variant">Manage active logistics and dispatching schedules.</p>
         </div>
-        <button 
-          className="bg-primary text-white px-lg py-md rounded-lg font-label-md flex items-center gap-sm hover:brightness-110 active:scale-95 transition-all shadow-sm"
-          onClick={() => setShowCreateModal(true)}
-        >
-          <span className="material-symbols-outlined text-[20px]">add</span>
-          Create Trip
-        </button>
+        {hasRole(['Dispatcher', 'Fleet Manager']) && (
+          <button 
+            className="bg-primary text-white px-lg py-md rounded-lg font-label-md flex items-center gap-sm hover:brightness-110 active:scale-95 transition-all shadow-sm"
+            onClick={() => setShowCreateModal(true)}
+            type="button"
+          >
+            <span className="material-symbols-outlined text-[20px]">add</span>
+            Create Trip
+          </button>
+        )}
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-md">
@@ -82,10 +200,16 @@ const Trips = () => {
         <div className="bg-surface-container-lowest border border-outline-variant p-md rounded-lg">
           <span className="text-label-sm text-outline block mb-xs">Total Cargo (MT)</span>
           <span className="text-headline-md font-bold text-primary">
-            {(trips.reduce((acc, t) => acc + t.cargo, 0) / 1000).toFixed(1)}
+            {(trips.reduce((acc, t) => acc + (t.cargoWeight || 0), 0) / 1000).toFixed(1)}
           </span>
         </div>
       </div>
+
+      {error && (
+        <div className="p-md bg-error/5 border border-error/20 rounded-lg text-body-md text-error">
+          {error}
+        </div>
+      )}
 
       <div className="bg-surface-container-lowest border border-outline-variant rounded-lg overflow-hidden flex flex-col">
         <div className="overflow-x-auto">
@@ -100,45 +224,63 @@ const Trips = () => {
                 <th className="p-4 font-label-md text-label-md text-outline uppercase tracking-wider">Cargo (kg)</th>
                 <th className="p-4 font-label-md text-label-md text-outline uppercase tracking-wider">Distance (km)</th>
                 <th className="p-4 font-label-md text-label-md text-outline uppercase tracking-wider">Status</th>
+                <th className="p-4 font-label-md text-label-md text-outline uppercase tracking-wider">Dispatched</th>
                 <th className="p-4 font-label-md text-label-md text-outline uppercase tracking-wider text-right">Actions</th>
               </tr>
             </thead>
             <tbody className="font-body-md divide-y divide-outline-variant">
-              {trips.map(trip => (
-                <tr key={trip.id} className="hover:bg-surface-container-low transition-colors group">
-                  <td className="p-4 font-bold">{trip.id}</td>
-                  <td className="p-4">{trip.source}</td>
-                  <td className="p-4">{trip.destination}</td>
-                  <td className="p-4">{trip.vehicle}</td>
-                  <td className="p-4">{trip.driver}</td>
-                  <td className="p-4">{trip.cargo.toLocaleString()}</td>
-                  <td className={`p-4 ${trip.distanceError ? 'text-error font-bold' : ''}`}>{trip.distance}</td>
-                  <td className="p-4">
-                    <span className={`px-sm py-xs rounded text-label-sm font-bold uppercase ${statusStyles[trip.status]}`}>
-                      {trip.status}
-                    </span>
-                  </td>
-                  <td className="p-4 text-right">
-                    {trip.status === 'DISPATCHED' && (
-                      <div className="flex items-center justify-end gap-sm">
-                        <button className="text-primary hover:bg-primary/10 px-sm py-1 rounded transition-colors text-label-sm font-bold" onClick={() => { setSelectedTrip(trip); setShowCompleteModal(true); }}>Complete</button>
-                        <button className="text-error hover:bg-error/10 px-sm py-1 rounded transition-colors text-label-sm font-bold" onClick={() => changeStatus(trip.id, 'CANCELLED')}>Cancel</button>
-                      </div>
-                    )}
-                    {trip.status === 'DRAFT' && (
-                      <div className="flex items-center justify-end gap-sm">
-                        <button className="text-primary hover:bg-primary/10 px-sm py-1 rounded transition-colors text-label-sm font-bold" onClick={() => changeStatus(trip.id, 'DISPATCHED')}>Dispatch</button>
-                        <button className="text-error hover:bg-error/10 px-sm py-1 rounded transition-colors text-label-sm font-bold" onClick={() => changeStatus(trip.id, 'CANCELLED')}>Cancel</button>
-                      </div>
-                    )}
-                    {(trip.status === 'COMPLETED' || trip.status === 'CANCELLED') && (
-                      <button className="text-on-surface-variant hover:text-on-surface p-1 rounded">
-                        <span className="material-symbols-outlined text-[20px]">more_vert</span>
-                      </button>
-                    )}
-                  </td>
+              {loading ? (
+                <tr>
+                  <td className="p-4 text-secondary" colSpan={10}>Loading...</td>
                 </tr>
-              ))}
+              ) : trips.length === 0 ? (
+                <tr>
+                  <td className="p-4 text-secondary" colSpan={10}>No trips found.</td>
+                </tr>
+              ) : (
+                trips.map(trip => (
+                  <tr key={trip.id} className="hover:bg-surface-container-low transition-colors group">
+                    <td className="p-4 font-bold">{formatTripId(trip.id)}</td>
+                    <td className="p-4">{trip.source}</td>
+                    <td className="p-4">{trip.destination}</td>
+                    <td className="p-4">{trip.vehicle?.regNumber || trip.vehicle?.name || '-'}</td>
+                    <td className="p-4">{trip.driver?.name || '-'}</td>
+                    <td className="p-4">{Number(trip.cargoWeight || 0).toLocaleString()}</td>
+                    <td className="p-4">{Number(trip.plannedDistance || 0)}</td>
+                    <td className="p-4">
+                      <span className={`px-sm py-xs rounded text-label-sm font-bold uppercase ${statusStyles[trip.status] || statusStyles.DRAFT}`}>
+                        {trip.status}
+                      </span>
+                    </td>
+                    <td className="p-4">{formatDateTime(trip.dispatchedAt)}</td>
+                    <td className="p-4 text-right">
+                      <div className="flex items-center justify-end gap-sm flex-wrap">
+                        <button
+                          className="text-on-surface-variant hover:text-on-surface px-sm py-1 rounded transition-colors text-label-sm font-bold"
+                          onClick={() => openTimeline(trip)}
+                          type="button"
+                        >
+                          Timeline
+                        </button>
+                        {hasRole(['Dispatcher', 'Fleet Manager']) && trip.status === 'DRAFT' && (
+                          <>
+                            <button className="text-primary hover:bg-primary/10 px-sm py-1 rounded transition-colors text-label-sm font-bold" onClick={() => dispatchTrip(trip)} type="button">Dispatch</button>
+                            <button className="text-error hover:bg-error/10 px-sm py-1 rounded transition-colors text-label-sm font-bold" onClick={() => cancelTrip(trip)} type="button">Cancel</button>
+                          </>
+                        )}
+                        {(hasRole(['Dispatcher', 'Fleet Manager']) || hasRole('Driver')) && trip.status === 'DISPATCHED' && (
+                          <>
+                            <button className="text-primary hover:bg-primary/10 px-sm py-1 rounded transition-colors text-label-sm font-bold" onClick={() => { setSelectedTrip(trip); setShowCompleteModal(true); }} type="button">Complete</button>
+                            {hasRole(['Dispatcher', 'Fleet Manager']) && (
+                              <button className="text-error hover:bg-error/10 px-sm py-1 rounded transition-colors text-label-sm font-bold" onClick={() => cancelTrip(trip)} type="button">Cancel</button>
+                            )}
+                          </>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>
@@ -158,40 +300,40 @@ const Trips = () => {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-md">
                 <div className="space-y-xs">
                   <label className="text-label-sm font-bold text-outline">Vehicle Selection</label>
-                  <select className="w-full border border-outline-variant rounded-lg p-sm focus:border-primary focus:ring-1 outline-none" value={newTrip.vehicle} onChange={e => setNewTrip({...newTrip, vehicle: e.target.value})} required>
+                  <select className="w-full border border-outline-variant rounded-lg p-sm focus:border-primary focus:ring-1 outline-none" value={newTrip.vehicleId} onChange={e => setNewTrip({ ...newTrip, vehicleId: e.target.value })} required>
                     <option value="">Select available vehicle</option>
-                    <option value="Truck-104">Truck-104 (Available)</option>
-                    <option value="Van-22">Van-22 (Available)</option>
-                    <option value="Truck-50">Truck-50 (Available)</option>
+                    {availableVehicles.map((v) => (
+                      <option key={v.id} value={v.id}>{v.regNumber} ({v.status})</option>
+                    ))}
                   </select>
                 </div>
                 <div className="space-y-xs">
                   <label className="text-label-sm font-bold text-outline">Assigned Driver</label>
-                  <select className="w-full border border-outline-variant rounded-lg p-sm focus:border-primary focus:ring-1 outline-none" value={newTrip.driver} onChange={e => setNewTrip({...newTrip, driver: e.target.value})} required>
+                  <select className="w-full border border-outline-variant rounded-lg p-sm focus:border-primary focus:ring-1 outline-none" value={newTrip.driverId} onChange={e => setNewTrip({ ...newTrip, driverId: e.target.value })} required>
                     <option value="">Select valid driver</option>
-                    <option value="Marcus Chen">Marcus Chen (Valid)</option>
-                    <option value="Jenny Slack">Jenny Slack (Valid)</option>
-                    <option value="Leonid Volkov">Leonid Volkov (Valid)</option>
+                    {availableDrivers.map((d) => (
+                      <option key={d.id} value={d.id}>{d.name} ({d.status})</option>
+                    ))}
                   </select>
                 </div>
               </div>
               <div className="space-y-xs">
                 <label className="text-label-sm font-bold text-outline">Cargo Weight (kg)</label>
-                <input type="number" className="w-full border border-outline-variant rounded-lg p-sm focus:border-primary focus:ring-1 outline-none" placeholder="e.g. 12000" value={newTrip.cargo} onChange={e => setNewTrip({...newTrip, cargo: e.target.value})} required />
+                <input type="number" className="w-full border border-outline-variant rounded-lg p-sm focus:border-primary focus:ring-1 outline-none" placeholder="e.g. 12000" value={newTrip.cargoWeight} onChange={e => setNewTrip({ ...newTrip, cargoWeight: e.target.value })} required />
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-md">
                 <div className="space-y-xs">
                   <label className="text-label-sm font-bold text-outline">Source Location</label>
-                  <input type="text" className="w-full border border-outline-variant rounded-lg p-sm focus:border-primary focus:ring-1 outline-none" placeholder="Start point" value={newTrip.source} onChange={e => setNewTrip({...newTrip, source: e.target.value})} required />
+                  <input type="text" className="w-full border border-outline-variant rounded-lg p-sm focus:border-primary focus:ring-1 outline-none" placeholder="Start point" value={newTrip.source} onChange={e => setNewTrip({ ...newTrip, source: e.target.value })} required />
                 </div>
                 <div className="space-y-xs">
                   <label className="text-label-sm font-bold text-outline">Destination</label>
-                  <input type="text" className="w-full border border-outline-variant rounded-lg p-sm focus:border-primary focus:ring-1 outline-none" placeholder="End point" value={newTrip.destination} onChange={e => setNewTrip({...newTrip, destination: e.target.value})} required />
+                  <input type="text" className="w-full border border-outline-variant rounded-lg p-sm focus:border-primary focus:ring-1 outline-none" placeholder="End point" value={newTrip.destination} onChange={e => setNewTrip({ ...newTrip, destination: e.target.value })} required />
                 </div>
               </div>
               <div className="space-y-xs">
                 <label className="text-label-sm font-bold text-outline">Planned Distance (km)</label>
-                <input type="number" className="w-full border border-outline-variant rounded-lg p-sm focus:border-primary focus:ring-1 outline-none" placeholder="Distance estimate" value={newTrip.distance} onChange={e => setNewTrip({...newTrip, distance: e.target.value})} required />
+                <input type="number" className="w-full border border-outline-variant rounded-lg p-sm focus:border-primary focus:ring-1 outline-none" placeholder="Distance estimate" value={newTrip.plannedDistance} onChange={e => setNewTrip({ ...newTrip, plannedDistance: e.target.value })} required />
               </div>
               <div className="flex justify-end gap-md pt-lg border-t border-outline-variant">
                 <button type="button" className="px-lg py-md rounded-lg font-label-md text-outline hover:bg-surface-container" onClick={() => setShowCreateModal(false)}>Cancel</button>
@@ -212,7 +354,7 @@ const Trips = () => {
             <form onSubmit={handleCompleteTrip}>
               <div className="p-lg space-y-lg">
                 <div className="p-md bg-primary-container/10 border border-primary-container/20 rounded-lg">
-                  <p className="text-body-md text-on-primary-fixed-variant">Recording final metrics for <span className="font-bold">{selectedTrip.id}</span>.</p>
+                  <p className="text-body-md text-on-primary-fixed-variant">Recording final metrics for <span className="font-bold">{formatTripId(selectedTrip.id)}</span>.</p>
                 </div>
                 <div className="space-y-xs">
                   <label className="text-label-sm font-bold text-outline">Final Odometer Reading</label>
@@ -228,6 +370,77 @@ const Trips = () => {
                 <button type="submit" className="bg-primary text-white px-xl py-md rounded-lg font-label-md hover:brightness-110">Finalize & Close</button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {showTimelineModal && timelineTrip && (
+        <div className="fixed inset-0 z-[110] bg-on-surface/40 backdrop-blur-sm flex items-center justify-center p-md">
+          <div className="bg-white w-full max-w-2xl rounded-xl shadow-2xl overflow-hidden border border-outline-variant">
+            <div className="p-lg border-b border-outline-variant flex items-center justify-between gap-md">
+              <div>
+                <h2 className="font-headline-md text-headline-md">Trip Timeline</h2>
+                <p className="text-body-md text-secondary mt-1">{formatTripId(timelineTrip.id)} · {timelineTrip.source} → {timelineTrip.destination}</p>
+              </div>
+              <button className="text-outline hover:text-on-surface" onClick={() => { setShowTimelineModal(false); setTimelineTrip(null); setTimelineEvents([]); setTimelineError(''); }} type="button">
+                <span className="material-symbols-outlined">close</span>
+              </button>
+            </div>
+
+            <div className="p-lg space-y-md max-h-[70vh] overflow-y-auto">
+              {timelineError && (
+                <div className="p-md bg-error/5 border border-error/20 rounded-lg text-body-md text-error">
+                  {timelineError}
+                </div>
+              )}
+
+              {timelineLoading ? (
+                <div className="text-body-md text-secondary">Loading timeline...</div>
+              ) : (
+                <div className="space-y-md">
+                  {timelineEvents.map((ev) => (
+                    <div key={ev.id} className="flex gap-3">
+                      <div className="w-2 flex flex-col items-center">
+                        <div className="w-2 h-2 rounded-full bg-primary mt-2"></div>
+                        <div className="flex-1 w-px bg-outline-variant"></div>
+                      </div>
+                      <div className="flex-1 pb-md">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <span className="px-2 py-1 rounded-full text-label-sm font-semibold bg-surface-container text-on-surface">{ev.type}</span>
+                          <span className="text-label-sm text-secondary">{formatDateTime(ev.createdAt)}</span>
+                        </div>
+                        <div className="text-body-md text-on-surface mt-xs">{ev.message}</div>
+                      </div>
+                    </div>
+                  ))}
+                  {timelineEvents.length === 0 && (
+                    <div className="text-body-md text-secondary">No events yet.</div>
+                  )}
+                </div>
+              )}
+
+              {hasRole('Driver') && (
+                <div className="border-t border-outline-variant pt-md">
+                  <div className="text-label-md font-semibold text-on-surface mb-sm">Post Note</div>
+                  <div className="flex gap-2">
+                    <input
+                      className="flex-1 border border-outline-variant rounded-lg p-2.5 text-body-md"
+                      placeholder="e.g. Delayed by traffic"
+                      value={newNote}
+                      onChange={(e) => setNewNote(e.target.value)}
+                    />
+                    <button
+                      className="bg-primary text-white px-4 py-2 rounded-lg font-label-md hover:brightness-110 disabled:opacity-60"
+                      onClick={postNote}
+                      type="button"
+                      disabled={!newNote.trim()}
+                    >
+                      Send
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       )}

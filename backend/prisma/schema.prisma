@@ -13,6 +13,10 @@ model User {
   password String
   name     String
   role     String
+
+  driver   Driver?
+  tripEvents TripEvent[]
+  verifiedDriverDocuments DriverDocument[] @relation("VerifiedBy")
 }
 
 model Vehicle {
@@ -41,6 +45,10 @@ model Driver {
   safetyScore     Int      @default(100)
   status          String   @default("AVAILABLE")
   trips           Trip[]
+
+  userId          Int?     @unique
+  user            User?    @relation(fields: [userId], references: [id])
+  documents       DriverDocument[]
 }
 
 model Trip {
@@ -52,7 +60,10 @@ model Trip {
   actualDistance  Float?
   status          String     @default("DRAFT")
   createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
+  dispatchedAt    DateTime?
   completedAt     DateTime?
+  cancelledAt     DateTime?
   
   vehicleId       Int
   vehicle         Vehicle    @relation(fields: [vehicleId], references: [id])
@@ -61,6 +72,7 @@ model Trip {
   
   fuelLogs        FuelLog[]
   expenses        Expense[]
+  events          TripEvent[]
 }
 
 model MaintenanceLog {
@@ -71,6 +83,9 @@ model MaintenanceLog {
   status      String    @default("ACTIVE")
   startDate   DateTime  @default(now())
   endDate     DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  closedAt    DateTime?
   
   vehicleId   Int
   vehicle     Vehicle   @relation(fields: [vehicleId], references: [id])
@@ -99,4 +114,53 @@ model Expense {
   vehicle     Vehicle  @relation(fields: [vehicleId], references: [id])
   tripId      Int?
   trip        Trip?    @relation(fields: [tripId], references: [id])
+}
+
+enum DriverDocumentType {
+  LICENSE
+  INSURANCE
+  OTHER
+}
+
+enum DriverDocumentStatus {
+  PENDING
+  VERIFIED
+  REJECTED
+  EXPIRED
+}
+
+model DriverDocument {
+  id              Int                  @id @default(autoincrement())
+  driverId        Int
+  driver          Driver               @relation(fields: [driverId], references: [id])
+  type            DriverDocumentType
+  fileUrl         String
+  status          DriverDocumentStatus @default(PENDING)
+  rejectionReason String?
+  uploadedAt      DateTime             @default(now())
+  verifiedAt      DateTime?
+  expiresAt       DateTime?
+
+  verifiedByUserId Int?
+  verifiedByUser   User?               @relation("VerifiedBy", fields: [verifiedByUserId], references: [id])
+}
+
+enum TripEventType {
+  CREATED
+  DISPATCHED
+  DRIVER_UPDATE
+  COMPLETED
+  CANCELLED
+  NOTE
+}
+
+model TripEvent {
+  id              Int          @id @default(autoincrement())
+  tripId          Int
+  trip            Trip         @relation(fields: [tripId], references: [id])
+  type            TripEventType
+  message         String
+  createdAt       DateTime     @default(now())
+  createdByUserId Int?
+  createdByUser   User?        @relation(fields: [createdByUserId], references: [id])
 }

@@ -1,5 +1,8 @@
-import React, { useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
+import axios from 'axios';
+
+const API_BASE = 'http://localhost:5000';
 
 const mockDriverProfile = {
   name: 'Elena Rodriguez',
@@ -34,11 +37,67 @@ const mockDriverProfile = {
 const DriverProfile = () => {
   const { user } = useAuth();
   const profile = mockDriverProfile;
+  const [documents, setDocuments] = useState([]);
+  const [docType, setDocType] = useState('LICENSE');
+  const [docFile, setDocFile] = useState(null);
+  const [docError, setDocError] = useState('');
+  const [docUploading, setDocUploading] = useState(false);
 
   const licenseExpiryDate = new Date(profile.license.expiry);
   const today = new Date();
   const daysUntilExpiry = Math.ceil((licenseExpiryDate - today) / (1000 * 60 * 60 * 24));
   const isExpiringSoon = daysUntilExpiry < 90;
+
+  const docStatusConfig = useMemo(() => ({
+    PENDING: { label: 'Pending', bg: 'bg-amber-100', text: 'text-amber-700', border: 'border-amber-200' },
+    VERIFIED: { label: 'Verified', bg: 'bg-primary/10', text: 'text-primary', border: 'border-primary/20' },
+    REJECTED: { label: 'Rejected', bg: 'bg-error/10', text: 'text-error', border: 'border-error/20' },
+    EXPIRED: { label: 'Expired', bg: 'bg-error/10', text: 'text-error', border: 'border-error/20' },
+  }), []);
+
+  const loadDocuments = async () => {
+    try {
+      setDocError('');
+      const res = await axios.get(`${API_BASE}/api/documents/me`);
+      setDocuments(res.data || []);
+    } catch (e) {
+      setDocError(e.response?.data?.error || 'Failed to load documents');
+    }
+  };
+
+  useEffect(() => {
+    if (user?.role === 'Driver') {
+      loadDocuments();
+    }
+  }, [user?.role]);
+
+  const handleUpload = async (e) => {
+    e.preventDefault();
+    if (!docFile) {
+      setDocError('Please choose a file to upload');
+      return;
+    }
+
+    try {
+      setDocUploading(true);
+      setDocError('');
+
+      const fd = new FormData();
+      fd.append('type', docType);
+      fd.append('file', docFile);
+
+      await axios.post(`${API_BASE}/api/documents`, fd, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+
+      setDocFile(null);
+      await loadDocuments();
+    } catch (e2) {
+      setDocError(e2.response?.data?.error || 'Upload failed');
+    } finally {
+      setDocUploading(false);
+    }
+  };
 
   return (
     <div className="space-y-lg max-w-5xl">
@@ -199,6 +258,104 @@ const DriverProfile = () => {
                 </p>
               </div>
             )}
+          </div>
+
+          <div className="bg-surface-container-lowest border border-outline-variant rounded-xl p-lg">
+            <div className="flex items-start justify-between gap-md mb-lg">
+              <div>
+                <h4 className="font-headline-md text-headline-md font-bold text-on-surface">Compliance Documents</h4>
+                <p className="text-body-md text-secondary mt-1">Upload your license and insurance documents for verification.</p>
+              </div>
+              <button
+                className="px-4 py-2 rounded-lg border border-outline-variant text-label-md hover:bg-surface-container transition-colors"
+                onClick={loadDocuments}
+                type="button"
+              >
+                Refresh
+              </button>
+            </div>
+
+            {docError && (
+              <div className="mb-md p-md bg-error/5 border border-error/20 rounded-lg text-body-md text-error">
+                {docError}
+              </div>
+            )}
+
+            <form className="grid grid-cols-1 md:grid-cols-3 gap-md items-end" onSubmit={handleUpload}>
+              <div className="space-y-xs">
+                <label className="block text-label-sm font-semibold text-secondary">Document type</label>
+                <select
+                  className="w-full border border-outline-variant rounded-lg text-body-md focus:ring-[#0D9488] focus:border-[#0D9488] p-2.5"
+                  value={docType}
+                  onChange={(e) => setDocType(e.target.value)}
+                >
+                  <option value="LICENSE">License</option>
+                  <option value="INSURANCE">Insurance</option>
+                  <option value="OTHER">Other</option>
+                </select>
+              </div>
+
+              <div className="space-y-xs">
+                <label className="block text-label-sm font-semibold text-secondary">Upload file</label>
+                <input
+                  className="w-full border border-outline-variant rounded-lg text-body-md p-2.5"
+                  type="file"
+                  onChange={(e) => setDocFile(e.target.files?.[0] || null)}
+                />
+              </div>
+
+              <button
+                className="bg-[#0D9488] text-white px-4 py-2 rounded-lg font-label-md hover:bg-opacity-90 transition-all disabled:opacity-60"
+                type="submit"
+                disabled={docUploading}
+              >
+                {docUploading ? 'Uploading...' : 'Upload'}
+              </button>
+            </form>
+
+            <div className="mt-lg border border-outline-variant rounded-xl overflow-hidden">
+              <div className="bg-surface-container-low px-md py-3 text-label-sm text-secondary font-semibold uppercase tracking-wider">
+                Uploaded Documents
+              </div>
+              <div className="divide-y divide-outline-variant">
+                {documents.map((d) => {
+                  const sc = docStatusConfig[d.status] || docStatusConfig.PENDING;
+                  return (
+                    <div key={d.id} className="px-md py-md flex flex-col sm:flex-row sm:items-center sm:justify-between gap-sm">
+                      <div>
+                        <div className="flex items-center gap-3">
+                          <span className="font-body-md font-semibold text-on-surface">{d.type}</span>
+                          <span className={`${sc.bg} ${sc.text} px-2 py-1 rounded-full text-label-sm font-semibold border ${sc.border}`}>
+                            {sc.label}
+                          </span>
+                        </div>
+                        <div className="text-label-sm text-secondary mt-xs">
+                          Uploaded {d.uploadedAt ? new Date(d.uploadedAt).toLocaleString() : '-'}
+                        </div>
+                        {d.status === 'REJECTED' && d.rejectionReason && (
+                          <div className="text-label-sm text-error mt-xs">
+                            {d.rejectionReason}
+                          </div>
+                        )}
+                      </div>
+                      <a
+                        className="text-primary font-semibold text-label-md hover:underline"
+                        href={`${API_BASE}${d.fileUrl}`}
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        View
+                      </a>
+                    </div>
+                  );
+                })}
+                {documents.length === 0 && (
+                  <div className="px-md py-lg text-body-md text-secondary">
+                    No documents uploaded yet.
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
         </div>
       </div>
