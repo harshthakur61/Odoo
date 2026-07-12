@@ -14,7 +14,7 @@ const Layout = () => {
     { name: 'Driver Verification', href: '/driver-verification', icon: 'verified_user', roles: ['Fleet Manager'] },
     { name: 'Trips', href: '/trips', icon: 'route', roles: ['Dispatcher', 'Safety Officer', 'Financial Analyst'] },
     { name: 'Fuel & Expenses', href: '/fuel', icon: 'local_gas_station', roles: ['Financial Analyst'] },
-    { name: 'Analytics', href: '/reports', icon: 'bar_chart', roles: ['Safety Officer', 'Financial Analyst'] },
+    { name: 'Emergency Reports', href: '/reports', icon: 'emergency', roles: ['Safety Officer', 'Financial Analyst'] },
   ];
 
   const driverNavigation = [
