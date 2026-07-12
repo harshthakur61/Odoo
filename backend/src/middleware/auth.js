@@ -6,6 +6,7 @@ const DEMO_USERS = {
   'admin@transitops.com': { name: 'Admin User', email: 'admin@transitops.com', role: 'Fleet Manager' },
   'dispatcher@transitops.com': { name: 'Mark Reynolds', email: 'dispatcher@transitops.com', role: 'Dispatcher' },
   'field@transitops.com': { name: 'Elena Rodriguez', email: 'field@transitops.com', role: 'Driver' },
+  'akashthakre1320@gmail.com': { name: 'Akash Thakur', email: 'akashthakre1320@gmail.com', role: 'Driver' },
   'safety@transitops.com': { name: 'Sarah Chen', email: 'safety@transitops.com', role: 'Safety Officer' },
   'finance@transitops.com': { name: 'James Wright', email: 'finance@transitops.com', role: 'Financial Analyst' },
 };
@@ -15,7 +16,7 @@ const ensureUser = async ({ email, name, role }) => {
   if (existing) return existing;
 
   const hashed = await bcrypt.hash('demo', 10);
-  return prisma.user.create({
+  const user = await prisma.user.create({
     data: {
       email,
       name,
@@ -23,6 +24,27 @@ const ensureUser = async ({ email, name, role }) => {
       password: hashed,
     },
   });
+
+  if (role === 'Driver') {
+    const existingDriver = await prisma.driver.findUnique({ where: { userId: user.id } });
+    if (!existingDriver) {
+      const now = new Date();
+      const expiry = new Date(now.getTime() + 365 * 24 * 60 * 60 * 1000);
+      await prisma.driver.create({
+        data: {
+          name,
+          licenseNumber: `DEMO-LIC-${user.id}`,
+          licenseCategory: 'Class B',
+          licenseExpiry: expiry,
+          status: 'AVAILABLE',
+          safetyScore: 100,
+          userId: user.id,
+        },
+      });
+    }
+  }
+
+  return user;
 };
 
 const verifyToken = async (req, res, next) => {
