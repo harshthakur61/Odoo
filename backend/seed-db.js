@@ -149,24 +149,37 @@ async function seedDB() {
     }
   }
 
-  // Create a trip for each driver (but keep vehicles/drivers AVAILABLE, don't mark as ON_TRIP yet)
+  // Create trips: one DISPATCHED for Elena Rodriguez, others DRAFT
   const tripSources = ['New York', 'Los Angeles', 'Chicago', 'Houston', 'Phoenix'];
   const tripDestinations = ['Boston', 'San Diego', 'Detroit', 'Dallas', 'Denver'];
   for (let i = 0; i < drivers.length; i++) {
     const driver = drivers[i];
     const vehicle = vehicles[i % vehicles.length];
-    await prisma.trip.create({
-      data: {
-        source: tripSources[i % tripSources.length],
-        destination: tripDestinations[i % tripDestinations.length],
-        cargoWeight: 1000 + (i * 200),
-        plannedDistance: 200 + (i * 50),
-        status: 'DRAFT', // Keep as draft so vehicles/drivers stay available
-        vehicleId: vehicle.id,
-        driverId: driver.id,
-      },
-    });
-    console.log('Created draft trip for driver:', driver.name);
+    const isElena = driver.name === 'Elena Rodriguez';
+    const tripData = {
+      source: tripSources[i % tripSources.length],
+      destination: tripDestinations[i % tripDestinations.length],
+      cargoWeight: 1000 + (i * 200),
+      plannedDistance: 200 + (i * 50),
+      status: isElena ? 'DISPATCHED' : 'DRAFT',
+      vehicleId: vehicle.id,
+      driverId: driver.id,
+    };
+
+    if (isElena) {
+      // For Elena's trip, set dispatchedAt and update vehicle/driver status
+      await prisma.$transaction(async (tx) => {
+        const trip = await tx.trip.create({
+          data: { ...tripData, dispatchedAt: new Date() },
+        });
+        await tx.vehicle.update({ where: { id: vehicle.id }, data: { status: 'ON_TRIP' } });
+        await tx.driver.update({ where: { id: driver.id }, data: { status: 'ON_TRIP' } });
+        console.log('Created DISPATCHED trip for driver:', driver.name);
+      });
+    } else {
+      await prisma.trip.create({ data: tripData });
+      console.log('Created DRAFT trip for driver:', driver.name);
+    }
   }
 
   console.log('Database seeded successfully!');
