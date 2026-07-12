@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>TransitOps - Maintenance Logs</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface-container-highest": "#e0e3e5",
+                    "on-error-container": "#93000a",
+                    "on-secondary-container": "#5c647a",
+                    "primary-fixed": "#89f5e7",
+                    "primary": "#00685f",
+                    "surface": "#f7f9fb",
+                    "surface-container-lowest": "#ffffff",
+                    "on-primary-fixed-variant": "#005049",
+                    "error-container": "#ffdad6",
+                    "primary-container": "#008378",
+                    "on-tertiary-fixed-variant": "#38485d",
+                    "surface-container": "#eceef0",
+                    "primary-fixed-dim": "#6bd8cb",
+                    "tertiary": "#4d5d73",
+                    "on-surface-variant": "#3d4947",
+                    "tertiary-container": "#66768d",
+                    "secondary": "#565e74",
+                    "on-background": "#191c1e",
+                    "inverse-surface": "#2d3133",
+                    "surface-bright": "#f7f9fb",
+                    "surface-tint": "#006a61",
+                    "on-primary": "#ffffff",
+                    "inverse-primary": "#6bd8cb",
+                    "inverse-on-surface": "#eff1f3",
+                    "secondary-container": "#dae2fd",
+                    "on-primary-container": "#f4fffc",
+                    "surface-container-high": "#e6e8ea",
+                    "on-tertiary-container": "#fdfcff",
+                    "outline-variant": "#bcc9c6",
+                    "on-primary-fixed": "#00201d",
+                    "secondary-fixed-dim": "#bec6e0",
+                    "secondary-fixed": "#dae2fd",
+                    "on-tertiary-fixed": "#0b1c30",
+                    "tertiary-fixed-dim": "#b7c8e1",
+                    "surface-variant": "#e0e3e5",
+                    "surface-container-low": "#f2f4f6",
+                    "surface-dim": "#d8dadc",
+                    "on-secondary-fixed": "#131b2e",
+                    "background": "#f7f9fb",
+                    "on-tertiary": "#ffffff",
+                    "on-error": "#ffffff",
+                    "tertiary-fixed": "#d3e4fe",
+                    "on-surface": "#191c1e",
+                    "on-secondary-fixed-variant": "#3f465c",
+                    "on-secondary": "#ffffff",
+                    "outline": "#6d7a77",
+                    "error": "#ba1a1a"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "sidebar-width": "260px",
+                    "xs": "4px",
+                    "gutter": "24px",
+                    "md": "16px",
+                    "lg": "24px",
+                    "2xl": "48px",
+                    "sm": "8px",
+                    "margin-mobile": "16px",
+                    "base": "4px",
+                    "xl": "32px"
+            },
+            "fontFamily": {
+                    "label-md": ["Hanken Grotesk"],
+                    "headline-lg-mobile": ["Hanken Grotesk"],
+                    "body-lg": ["Hanken Grotesk"],
+                    "display": ["Hanken Grotesk"],
+                    "headline-md": ["Hanken Grotesk"],
+                    "label-sm": ["Hanken Grotesk"],
+                    "body-md": ["Hanken Grotesk"],
+                    "headline-lg": ["Hanken Grotesk"]
+            },
+            "fontSize": {
+                    "label-md": ["12px", {"lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "500"}],
+                    "headline-lg-mobile": ["20px", {"lineHeight": "28px", "fontWeight": "500"}],
+                    "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "display": ["30px", {"lineHeight": "36px", "letterSpacing": "-0.02em", "fontWeight": "500"}],
+                    "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "500"}],
+                    "label-sm": ["11px", {"lineHeight": "14px", "letterSpacing": "0.03em", "fontWeight": "500"}],
+                    "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "headline-lg": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "500"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body { font-family: 'Hanken Grotesk', sans-serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .truncate-line {
+            display: -webkit-box;
+            -webkit-line-clamp: 1;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        .sidebar-active {
+            color: #89f5e7 !important;
+            background-color: #005049 !important;
+            border-right: 4px solid #89f5e7 !important;
+        }
+        /* Custom modal transition */
+        .modal-overlay { transition: opacity 0.3s ease; }
+        .modal-content { transition: transform 0.3s ease; }
+    </style>
+</head>
+<body class="bg-surface text-on-surface selection:bg-primary-fixed selection:text-on-primary-fixed">
+<!-- Side Navigation Bar -->
+<aside class="fixed h-full w-[260px] left-0 top-0 bg-inverse-surface flex flex-col border-r border-outline-variant z-50">
+<div class="p-lg">
+<h1 class="font-headline-md text-headline-md font-bold text-white tracking-tight">TransitOps</h1>
+<p class="text-label-sm text-secondary-fixed-dim uppercase tracking-widest mt-xs">Fleet Operations</p>
+</div>
+<nav class="flex-1 px-sm space-y-xs overflow-y-auto">
+<a class="flex items-center gap-md px-md py-sm rounded-sm font-body-md text-body-md text-secondary-fixed-dim hover:text-white hover:bg-secondary-fixed-variant transition-colors group" href="#">
+<span class="material-symbols-outlined group-hover:scale-110 transition-transform">dashboard</span>
+<span>Fleet Overview</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm rounded-sm font-body-md text-body-md text-secondary-fixed-dim hover:text-white hover:bg-secondary-fixed-variant transition-colors group" href="#">
+<span class="material-symbols-outlined group-hover:scale-110 transition-transform">location_on</span>
+<span>Vehicle Tracking</span>
+</a>
+<!-- Active State: Maintenance Logs -->
+<a class="flex items-center gap-md px-md py-sm rounded-sm font-body-md text-body-md sidebar-active transition-colors group" href="#">
+<span class="material-symbols-outlined group-hover:scale-110 transition-transform" style="font-variation-settings: 'FILL' 1;">build</span>
+<span>Maintenance Logs</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm rounded-sm font-body-md text-body-md text-secondary-fixed-dim hover:text-white hover:bg-secondary-fixed-variant transition-colors group" href="#">
+<span class="material-symbols-outlined group-hover:scale-110 transition-transform">calendar_today</span>
+<span>Driver Schedules</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm rounded-sm font-body-md text-body-md text-secondary-fixed-dim hover:text-white hover:bg-secondary-fixed-variant transition-colors group" href="#">
+<span class="material-symbols-outlined group-hover:scale-110 transition-transform">bar_chart</span>
+<span>Analytics</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm rounded-sm font-body-md text-body-md text-secondary-fixed-dim hover:text-white hover:bg-secondary-fixed-variant transition-colors group" href="#">
+<span class="material-symbols-outlined group-hover:scale-110 transition-transform">settings</span>
+<span>Admin Panel</span>
+</a>
+</nav>
+<div class="p-sm border-t border-outline-variant/20">
+<a class="flex items-center gap-md px-md py-sm rounded-sm font-body-md text-body-md text-secondary-fixed-dim hover:text-white hover:bg-secondary-fixed-variant transition-colors" href="#">
+<span class="material-symbols-outlined">help</span>
+<span>Help Support</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm rounded-sm font-body-md text-body-md text-secondary-fixed-dim hover:text-white hover:bg-secondary-fixed-variant transition-colors" href="#">
+<span class="material-symbols-outlined">logout</span>
+<span>Log Out</span>
+</a>
+</div>
+</aside>
+<!-- Top Navigation Bar -->
+<header class="flex justify-between items-center h-16 px-lg ml-[260px] w-[calc(100%-260px)] fixed top-0 bg-surface border-b border-outline-variant z-40">
+<div class="flex items-center gap-lg">
+<h2 class="font-headline-md text-headline-md font-bold text-primary">Maintenance</h2>
+<div class="relative w-72">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline">search</span>
+<input class="w-full bg-surface-container-low border border-outline-variant rounded-lg pl-10 pr-4 py-1.5 text-body-md focus:ring-1 focus:ring-primary focus:border-primary outline-none transition-all" placeholder="Search maintenance records..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-md">
+<button class="p-2 rounded-full hover:bg-surface-container-low transition-all relative">
+<span class="material-symbols-outlined text-on-surface-variant">notifications</span>
+<span class="absolute top-2 right-2 w-2 h-2 bg-error rounded-full border-2 border-surface"></span>
+</button>
+<button class="p-2 rounded-full hover:bg-surface-container-low transition-all">
+<span class="material-symbols-outlined text-on-surface-variant">settings</span>
+</button>
+<div class="h-8 w-px bg-outline-variant mx-2"></div>
+<div class="flex items-center gap-sm">
+<img class="w-8 h-8 rounded-full border border-outline-variant object-cover" data-alt="A professional headshot of a fleet operations manager in a corporate office setting, clean lighting, 4k high definition, professional attire." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBowV8SLWO_3HuYEPpNb7Poj6MVt-BFxjwljp13yCpFXmzD9QSfSc6tdhKmnXgiukSMj9qtYPzEivFEMGcvxsEKRg7fu1g188vRCrd7kRWmRv0L4MXz9Apxn4OHFMBgMHWZD9_NFubYjMdGx0MvepzaMLor99P8TkWOBkAO354WMgUYEpXjKabTzx8tyUGzzDgOub00FG4G12hTUdzMWYVrJ0eOKR0GYHKcq3Ivic_1AhNAIGl_B6U"/>
+<div class="flex flex-col">
+<span class="text-label-md font-bold text-on-surface leading-none">Alex Rivera</span>
+<span class="text-label-sm text-on-surface-variant leading-none mt-1">Fleet Manager</span>
+</div>
+</div>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="ml-[260px] mt-16 p-lg bg-surface min-h-[calc(100vh-64px)]">
+<!-- Toolbar -->
+<div class="flex justify-between items-center mb-lg">
+<div>
+<h3 class="font-headline-lg text-headline-lg text-on-surface">Maintenance History</h3>
+<p class="text-body-md text-on-surface-variant">Monitor and update vehicle service logs.</p>
+</div>
+<!-- Manager Only Action -->
+<button class="flex items-center gap-2 bg-[#0D9488] text-white px-lg py-2.5 rounded-lg font-body-md font-bold hover:bg-[#0b7a70] active:scale-98 transition-all shadow-none" onclick="toggleModal('maintenance-modal')">
+<span class="material-symbols-outlined">add</span>
+                Add Maintenance
+            </button>
+</div>
+<!-- Table Container -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-lg overflow-hidden">
+<table class="w-full text-left border-collapse">
+<thead class="bg-surface-container-low border-b border-outline-variant">
+<tr>
+<th class="px-lg py-md font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Vehicle</th>
+<th class="px-lg py-md font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Type</th>
+<th class="px-lg py-md font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Description</th>
+<th class="px-lg py-md font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Cost</th>
+<th class="px-lg py-md font-label-md text-label-md text-on-surface-variant uppercase tracking-wider text-center">Status</th>
+<th class="px-lg py-md font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Start Date</th>
+<th class="px-lg py-md font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">End Date</th>
+<th class="px-lg py-md font-label-md text-label-md text-on-surface-variant uppercase tracking-wider text-right">Actions</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant" id="maintenance-table-body">
+<!-- Row 1 -->
+<tr class="hover:bg-surface-container-low transition-colors group">
+<td class="px-lg py-md font-body-md text-on-surface font-medium">Truck 04</td>
+<td class="px-lg py-md font-body-md text-on-surface">Oil Change</td>
+<td class="px-lg py-md font-body-md text-on-surface-variant max-w-xs"><span class="truncate-line">Routine maintenance</span></td>
+<td class="px-lg py-md font-body-md text-on-surface font-mono">$150</td>
+<td class="px-lg py-md text-center">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-label-sm font-bold bg-[#86efac] text-[#064e3b]">Closed</span>
+</td>
+<td class="px-lg py-md font-body-md text-on-surface-variant">2023-10-01</td>
+<td class="px-lg py-md font-body-md text-on-surface-variant">2023-10-01</td>
+<td class="px-lg py-md text-right"></td>
+</tr>
+<!-- Row 2 -->
+<tr class="hover:bg-surface-container-low transition-colors group">
+<td class="px-lg py-md font-body-md text-on-surface font-medium">Van 12</td>
+<td class="px-lg py-md font-body-md text-on-surface">Brake Inspection</td>
+<td class="px-lg py-md font-body-md text-on-surface-variant max-w-xs"><span class="truncate-line">Squeaking brakes reported by driver</span></td>
+<td class="px-lg py-md font-body-md text-on-surface font-mono">$200</td>
+<td class="px-lg py-md text-center">
+<span class="status-badge inline-flex items-center px-2.5 py-0.5 rounded-full text-label-sm font-bold bg-[#fef08a] text-[#713f12]">Active</span>
+</td>
+<td class="px-lg py-md font-body-md text-on-surface-variant">2023-10-25</td>
+<td class="px-lg py-md font-body-md text-on-surface-variant text-outline italic">In progress</td>
+<td class="px-lg py-md text-right">
+<button class="p-1.5 rounded-full text-primary hover:bg-primary-fixed group-active:scale-95 transition-all" onclick="closeRecord(this)" title="Mark as Closed">
+<span class="material-symbols-outlined">check_circle</span>
+</button>
+</td>
+</tr>
+<!-- Row 3 -->
+<tr class="hover:bg-surface-container-low transition-colors group">
+<td class="px-lg py-md font-body-md text-on-surface font-medium">Trailer 09</td>
+<td class="px-lg py-md font-body-md text-on-surface">Tire Rotation</td>
+<td class="px-lg py-md font-body-md text-on-surface-variant max-w-xs"><span class="truncate-line">Periodic rotation</span></td>
+<td class="px-lg py-md font-body-md text-on-surface font-mono">$80</td>
+<td class="px-lg py-md text-center">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-label-sm font-bold bg-[#86efac] text-[#064e3b]">Closed</span>
+</td>
+<td class="px-lg py-md font-body-md text-on-surface-variant">2023-09-15</td>
+<td class="px-lg py-md font-body-md text-on-surface-variant">2023-09-15</td>
+<td class="px-lg py-md text-right"></td>
+</tr>
+<!-- Row 4 -->
+<tr class="hover:bg-surface-container-low transition-colors group">
+<td class="px-lg py-md font-body-md text-on-surface font-medium">Truck 02</td>
+<td class="px-lg py-md font-body-md text-on-surface">Engine Overhaul</td>
+<td class="px-lg py-md font-body-md text-on-surface-variant max-w-xs"><span class="truncate-line">Major service, cylinder head replacement and gasket work</span></td>
+<td class="px-lg py-md font-body-md text-on-surface font-mono">$2500</td>
+<td class="px-lg py-md text-center">
+<span class="status-badge inline-flex items-center px-2.5 py-0.5 rounded-full text-label-sm font-bold bg-[#fef08a] text-[#713f12]">Active</span>
+</td>
+<td class="px-lg py-md font-body-md text-on-surface-variant">2023-10-20</td>
+<td class="px-lg py-md font-body-md text-on-surface-variant text-outline italic">In progress</td>
+<td class="px-lg py-md text-right">
+<button class="p-1.5 rounded-full text-primary hover:bg-primary-fixed group-active:scale-95 transition-all" onclick="closeRecord(this)" title="Mark as Closed">
+<span class="material-symbols-outlined">check_circle</span>
+</button>
+</td>
+</tr>
+<!-- Row 5 -->
+<tr class="hover:bg-surface-container-low transition-colors group">
+<td class="px-lg py-md font-body-md text-on-surface font-medium">Van 05</td>
+<td class="px-lg py-md font-body-md text-on-surface">Headlight Replacement</td>
+<td class="px-lg py-md font-body-md text-on-surface-variant max-w-xs"><span class="truncate-line">Left bulb burnt out</span></td>
+<td class="px-lg py-md font-body-md text-on-surface font-mono">$45</td>
+<td class="px-lg py-md text-center">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-label-sm font-bold bg-[#86efac] text-[#064e3b]">Closed</span>
+</td>
+<td class="px-lg py-md font-body-md text-on-surface-variant">2023-10-10</td>
+<td class="px-lg py-md font-body-md text-on-surface-variant">2023-10-10</td>
+<td class="px-lg py-md text-right"></td>
+</tr>
+</tbody>
+</table>
+</div>
+</main>
+<!-- Success Toast -->
+<div class="fixed bottom-lg right-lg flex items-center gap-md bg-inverse-surface text-white px-lg py-md rounded-lg transform translate-y-24 opacity-0 transition-all duration-300 z-[100]" id="toast">
+<span class="material-symbols-outlined text-primary-fixed">check_circle</span>
+<span class="font-body-md" id="toast-message">Record updated successfully</span>
+</div>
+<!-- Add Maintenance Modal -->
+<div class="fixed inset-0 z-[60] flex items-center justify-center hidden" id="maintenance-modal">
+<div class="absolute inset-0 bg-black/40 backdrop-blur-sm" onclick="toggleModal('maintenance-modal')"></div>
+<div class="relative bg-surface w-full max-w-lg rounded-xl border border-outline-variant shadow-none overflow-hidden scale-95 opacity-0 transition-all duration-200" id="modal-container">
+<div class="flex items-center justify-between px-lg py-md bg-surface-container-low border-b border-outline-variant">
+<h4 class="font-headline-md text-headline-md text-on-surface">Add Maintenance Record</h4>
+<button class="p-1 hover:bg-surface-container-highest rounded-full transition-all" onclick="toggleModal('maintenance-modal')">
+<span class="material-symbols-outlined">close</span>
+</button>
+</div>
+<form class="p-lg space-y-md" id="maintenance-form">
+<div class="grid grid-cols-2 gap-md">
+<div class="space-y-xs">
+<label class="font-label-md text-on-surface-variant">Vehicle</label>
+<select class="w-full bg-surface-container-lowest border border-outline-variant rounded-lg px-md py-2 text-body-md focus:ring-1 focus:ring-primary focus:border-primary outline-none appearance-none" required="">
+<option value="">Select vehicle</option>
+<option>Truck 01</option>
+<option>Truck 02</option>
+<option>Van 05</option>
+<option>Van 12</option>
+<option>Trailer 09</option>
+</select>
+</div>
+<div class="space-y-xs">
+<label class="font-label-md text-on-surface-variant">Type</label>
+<select class="w-full bg-surface-container-lowest border border-outline-variant rounded-lg px-md py-2 text-body-md focus:ring-1 focus:ring-primary focus:border-primary outline-none appearance-none" required="">
+<option value="">Select type</option>
+<option>Routine</option>
+<option>Repair</option>
+<option>Inspection</option>
+<option>Cleaning</option>
+</select>
+</div>
+</div>
+<div class="space-y-xs">
+<label class="font-label-md text-on-surface-variant">Description</label>
+<textarea class="w-full bg-surface-container-lowest border border-outline-variant rounded-lg px-md py-2 text-body-md focus:ring-1 focus:ring-primary focus:border-primary outline-none min-h-[100px]" placeholder="Detailed description of work performed..." required=""></textarea>
+</div>
+<div class="grid grid-cols-2 gap-md">
+<div class="space-y-xs">
+<label class="font-label-md text-on-surface-variant">Cost ($)</label>
+<input class="w-full bg-surface-container-lowest border border-outline-variant rounded-lg px-md py-2 text-body-md focus:ring-1 focus:ring-primary focus:border-primary outline-none" placeholder="0.00" required="" step="0.01" type="number"/>
+</div>
+<div class="space-y-xs">
+<label class="font-label-md text-on-surface-variant">Start Date</label>
+<input class="w-full bg-surface-container-lowest border border-outline-variant rounded-lg px-md py-2 text-body-md focus:ring-1 focus:ring-primary focus:border-primary outline-none" id="start-date-picker" required="" type="date"/>
+</div>
+</div>
+<div class="pt-lg flex justify-end gap-md border-t border-outline-variant mt-lg">
+<button class="px-lg py-2 rounded-lg border border-outline-variant font-body-md font-bold text-on-surface-variant hover:bg-surface-container-low transition-all" onclick="toggleModal('maintenance-modal')" type="button">Cancel</button>
+<button class="px-lg py-2 rounded-lg bg-[#0D9488] text-white font-body-md font-bold hover:bg-[#0b7a70] active:scale-95 transition-all" type="submit">Save Log</button>
+</div>
+</form>
+</div>
+</div>
+<script>
+        // Set default date for picker
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('start-date-picker').value = today;
+
+        function toggleModal(id) {
+            const modal = document.getElementById(id);
+            const container = document.getElementById('modal-container');
+            
+            if (modal.classList.contains('hidden')) {
+                modal.classList.remove('hidden');
+                setTimeout(() => {
+                    container.classList.remove('scale-95', 'opacity-0');
+                    container.classList.add('scale-100', 'opacity-100');
+                }, 10);
+            } else {
+                container.classList.add('scale-95', 'opacity-0');
+                container.classList.remove('scale-100', 'opacity-100');
+                setTimeout(() => {
+                    modal.classList.add('hidden');
+                }, 200);
+            }
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            const toastMsg = document.getElementById('toast-message');
+            toastMsg.innerText = message;
+            toast.classList.remove('translate-y-24', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+            
+            setTimeout(() => {
+                toast.classList.add('translate-y-24', 'opacity-0');
+                toast.classList.remove('translate-y-0', 'opacity-100');
+            }, 3000);
+        }
+
+        function closeRecord(btn) {
+            const row = btn.closest('tr');
+            const statusCell = row.querySelector('.status-badge');
+            const endDateCell = row.cells[6];
+            const actionCell = row.cells[7];
+
+            // Update UI with simulated delay
+            btn.innerHTML = `<span class="material-symbols-outlined animate-pulse">sync</span>`;
+            
+            setTimeout(() => {
+                statusCell.className = "inline-flex items-center px-2.5 py-0.5 rounded-full text-label-sm font-bold bg-[#86efac] text-[#064e3b]";
+                statusCell.innerText = "Closed";
+                endDateCell.className = "px-lg py-md font-body-md text-on-surface-variant";
+                endDateCell.innerText = today;
+                actionCell.innerHTML = "";
+                showToast("Maintenance record marked as closed");
+            }, 600);
+        }
+
+        document.getElementById('maintenance-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const submitBtn = e.target.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerText;
+            
+            submitBtn.innerText = "Updating...";
+            submitBtn.disabled = true;
+
+            setTimeout(() => {
+                toggleModal('maintenance-modal');
+                showToast("New maintenance log successfully added");
+                submitBtn.innerText = originalText;
+                submitBtn.disabled = false;
+                e.target.reset();
+                document.getElementById('start-date-picker').value = today;
+            }, 800);
+        });
+    </script>
+</body></html>

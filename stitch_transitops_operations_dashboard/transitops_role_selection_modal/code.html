@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>TransitOps | Login</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "secondary-fixed-dim": "#bec6e0",
+                    "on-tertiary-container": "#fdfcff",
+                    "tertiary-fixed-dim": "#b7c8e1",
+                    "primary-container": "#008378",
+                    "on-secondary-fixed-variant": "#3f465c",
+                    "on-error": "#ffffff",
+                    "error": "#ba1a1a",
+                    "on-secondary": "#ffffff",
+                    "secondary": "#565e74",
+                    "on-tertiary": "#ffffff",
+                    "primary-fixed-dim": "#6bd8cb",
+                    "on-primary-container": "#f4fffc",
+                    "on-error-container": "#93000a",
+                    "on-tertiary-fixed": "#0b1c30",
+                    "on-surface-variant": "#3d4947",
+                    "on-primary": "#ffffff",
+                    "on-primary-fixed-variant": "#005049",
+                    "inverse-on-surface": "#eff1f3",
+                    "surface-container": "#eceef0",
+                    "surface-container-high": "#e6e8ea",
+                    "on-background": "#191c1e",
+                    "outline": "#6d7a77",
+                    "tertiary-fixed": "#d3e4fe",
+                    "on-secondary-container": "#5c647a",
+                    "surface-dim": "#d8dadc",
+                    "inverse-surface": "#2d3133",
+                    "surface-container-lowest": "#ffffff",
+                    "primary-fixed": "#89f5e7",
+                    "secondary-container": "#dae2fd",
+                    "surface": "#f7f9fb",
+                    "primary": "#00685f",
+                    "on-secondary-fixed": "#131b2e",
+                    "surface-container-low": "#f2f4f6",
+                    "surface-variant": "#e0e3e5",
+                    "surface-container-highest": "#e0e3e5",
+                    "on-surface": "#191c1e",
+                    "tertiary-container": "#66768d",
+                    "surface-bright": "#f7f9fb",
+                    "on-tertiary-fixed-variant": "#38485d",
+                    "tertiary": "#4d5d73",
+                    "error-container": "#ffdad6",
+                    "on-primary-fixed": "#00201d",
+                    "background": "#f7f9fb",
+                    "inverse-primary": "#6bd8cb",
+                    "outline-variant": "#bcc9c6",
+                    "secondary-fixed": "#dae2fd",
+                    "surface-tint": "#006a61"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "lg": "24px",
+                    "xl": "32px",
+                    "gutter": "24px",
+                    "margin-mobile": "16px",
+                    "base": "4px",
+                    "sidebar-width": "260px",
+                    "md": "16px",
+                    "2xl": "48px",
+                    "xs": "4px",
+                    "sm": "8px"
+            },
+            "fontFamily": {
+                    "label-md": ["Hanken Grotesk"],
+                    "label-sm": ["Hanken Grotesk"],
+                    "body-md": ["Hanken Grotesk"],
+                    "headline-lg-mobile": ["Hanken Grotesk"],
+                    "display": ["Hanken Grotesk"],
+                    "headline-lg": ["Hanken Grotesk"],
+                    "body-lg": ["Hanken Grotesk"],
+                    "headline-md": ["Hanken Grotesk"]
+            },
+            "fontSize": {
+                    "label-md": ["12px", {"lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "500"}],
+                    "label-sm": ["11px", {"lineHeight": "14px", "letterSpacing": "0.03em", "fontWeight": "500"}],
+                    "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "headline-lg-mobile": ["20px", {"lineHeight": "28px", "fontWeight": "500"}],
+                    "display": ["30px", {"lineHeight": "36px", "letterSpacing": "-0.02em", "fontWeight": "500"}],
+                    "headline-lg": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "500"}],
+                    "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "500"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            background-color: #f8fafc;
+            font-family: 'Hanken Grotesk', sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        /* Custom ring color to match primary teal exactly */
+        .focus-ring-teal:focus {
+            outline: none;
+            border-color: #00685f;
+            --tw-ring-color: #00685f;
+            box-shadow: 0 0 0 1px #00685f;
+        }
+        .disabled-btn {
+            opacity: 0.7;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen p-md">
+<!-- Login Container -->
+<div class="w-full max-w-[400px] flex flex-col items-center">
+<!-- Header / Identity -->
+<div class="text-center mb-xl">
+<!-- Brand Logo Representation -->
+<div class="inline-flex items-center justify-center w-12 h-12 bg-primary rounded-lg mb-md">
+<span class="material-symbols-outlined text-white text-[28px]" data-icon="local_shipping">local_shipping</span>
+</div>
+<h1 class="font-headline-lg text-headline-lg text-on-surface font-bold tracking-tight">TransitOps</h1>
+<p class="font-body-md text-body-md text-on-surface-variant">Fleet operations platform</p>
+</div>
+<!-- Login Card -->
+<div class="w-full bg-white border border-outline-variant rounded-lg p-xl">
+<form class="space-y-lg" id="loginForm">
+<!-- Email Field -->
+<div class="space-y-sm">
+<label class="font-label-md text-label-md text-on-surface-variant" for="email">Email</label>
+<div class="relative">
+<input class="w-full h-11 px-md bg-white border border-outline-variant rounded-lg font-body-md text-body-md text-on-surface placeholder:text-outline focus-ring-teal transition-all" id="email" name="email" placeholder="name@company.com" required="" type="email"/>
+</div>
+</div>
+<!-- Password Field -->
+<div class="space-y-sm">
+<label class="font-label-md text-label-md text-on-surface-variant" for="password">Password</label>
+<div class="relative">
+<input class="w-full h-11 px-md bg-white border border-outline-variant rounded-lg font-body-md text-body-md text-on-surface placeholder:text-outline focus-ring-teal transition-all" id="password" name="password" placeholder="Enter password" required="" type="password"/>
+</div>
+</div>
+<!-- Primary Action -->
+<button class="w-full h-11 bg-primary text-white font-label-md text-label-md font-bold rounded-lg transition-colors hover:bg-primary-container active:scale-[0.98] duration-200" id="submitBtn" type="submit">
+                    Sign in
+                </button>
+</form>
+</div>
+<!-- Visual Anchor (Subtle) -->
+<div class="mt-xl opacity-20 grayscale">
+<div class="flex items-center gap-xs">
+<div class="h-[1px] w-8 bg-outline"></div>
+<span class="font-label-sm text-label-sm text-outline">v2.4.0-stable</span>
+<div class="h-[1px] w-8 bg-outline"></div>
+</div>
+</div>
+</div>
+<!-- Script for interaction logic -->
+<script>
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const btn = document.getElementById('submitBtn');
+            const emailInput = document.getElementById('email');
+            const passInput = document.getElementById('password');
+
+            // Visual State Update
+            btn.textContent = 'Signing in...';
+            btn.classList.add('disabled-btn');
+            emailInput.disabled = true;
+            passInput.disabled = true;
+            
+            // Artificial delay to simulate authentication
+            setTimeout(() => {
+                // In a real app, logic for redirect or error handling would go here
+                console.log('Login attempt recorded for:', emailInput.value);
+                
+                // For demonstration, we'll reset after 2 seconds to show functionality
+                /* 
+                btn.textContent = 'Sign in';
+                btn.classList.remove('disabled-btn');
+                emailInput.disabled = false;
+                passInput.disabled = false;
+                */
+            }, 2000);
+        });
+    </script>
+<div class="fixed inset-0 z-50 flex items-center justify-center bg-on-surface/40 backdrop-blur-sm hidden" id="roleModal">
+<div class="bg-white w-full max-w-[640px] mx-md rounded-xl p-xl space-y-lg">
+<div class="text-center">
+<h2 class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Choose how you'd like to sign in</h2>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-md">
+<!-- Fleet Manager -->
+<button class="role-card flex flex-col items-start p-md border border-outline-variant rounded-lg text-left transition-all hover:border-primary focus:border-primary focus:ring-0 group">
+<div class="w-10 h-10 rounded-lg bg-surface-container flex items-center justify-center mb-md group-hover:bg-primary-container transition-colors">
+<span class="material-symbols-outlined text-on-surface-variant group-hover:text-primary">local_shipping</span>
+</div>
+<div class="font-bold text-body-lg text-on-surface mb-xs">Fleet manager</div>
+<p class="text-body-md text-on-surface-variant">Oversees fleet assets, maintenance, vehicle lifecycle, and operational efficiency.</p>
+</button>
+<!-- Driver -->
+<button class="role-card flex flex-col items-start p-md border border-outline-variant rounded-lg text-left transition-all hover:border-primary focus:border-primary focus:ring-0 group">
+<div class="w-10 h-10 rounded-lg bg-surface-container flex items-center justify-center mb-md group-hover:bg-primary-container transition-colors">
+<span class="material-symbols-outlined text-on-surface-variant group-hover:text-primary">steering</span>
+</div>
+<div class="font-bold text-body-lg text-on-surface mb-xs">Driver</div>
+<p class="text-body-md text-on-surface-variant">Creates trips, assigns vehicles and drivers, and monitors active deliveries.</p>
+</button>
+<!-- Safety Officer -->
+<button class="role-card flex flex-col items-start p-md border border-outline-variant rounded-lg text-left transition-all hover:border-primary focus:border-primary focus:ring-0 group">
+<div class="w-10 h-10 rounded-lg bg-surface-container flex items-center justify-center mb-md group-hover:bg-primary-container transition-colors">
+<span class="material-symbols-outlined text-on-surface-variant group-hover:text-primary">shield_person</span>
+</div>
+<div class="font-bold text-body-lg text-on-surface mb-xs">Safety officer</div>
+<p class="text-body-md text-on-surface-variant">Ensures driver compliance, tracks license validity, and monitors safety scores.</p>
+</button>
+<!-- Financial Analyst -->
+<button class="role-card flex flex-col items-start p-md border border-outline-variant rounded-lg text-left transition-all hover:border-primary focus:border-primary focus:ring-0 group">
+<div class="w-10 h-10 rounded-lg bg-surface-container flex items-center justify-center mb-md group-hover:bg-primary-container transition-colors">
+<span class="material-symbols-outlined text-on-surface-variant group-hover:text-primary">bar_chart</span>
+</div>
+<div class="font-bold text-body-lg text-on-surface mb-xs">Financial analyst</div>
+<p class="text-body-md text-on-surface-variant">Reviews operational expenses, fuel consumption, maintenance costs, and profitability.</p>
+</button>
+</div>
+</div>
+</div></body></html>
