@@ -44,6 +44,9 @@ app.use((err, req, res, next) => {
 });
 
 const ensureDemoData = async () => {
+  const bcrypt = require('bcrypt');
+  
+  // Create demo vehicle if none exist
   const vehiclesCount = await prisma.vehicle.count();
   if (vehiclesCount === 0) {
     await prisma.vehicle.create({
@@ -58,6 +61,58 @@ const ensureDemoData = async () => {
         region: 'Demo',
       },
     });
+  }
+
+  // Create demo users and drivers
+  const demoUsers = [
+    { email: 'admin@transitops.com', name: 'Admin User', role: 'Fleet Manager' },
+    { email: 'dispatcher@transitops.com', name: 'Mark Reynolds', role: 'Dispatcher' },
+    { email: 'field@transitops.com', name: 'Elena Rodriguez', role: 'Driver' },
+    { email: 'akashthakre1320@gmail.com', name: 'Akash Thakur', role: 'Driver' },
+    { email: 'safety@transitops.com', name: 'Sarah Chen', role: 'Safety Officer' },
+    { email: 'finance@transitops.com', name: 'James Wright', role: 'Financial Analyst' },
+  ];
+
+  const hashedPassword = await bcrypt.hash('demo', 10);
+
+  for (const userData of demoUsers) {
+    const existingUser = await prisma.user.findUnique({
+      where: { email: userData.email },
+    });
+
+    if (!existingUser) {
+      const user = await prisma.user.create({
+        data: {
+          email: userData.email,
+          name: userData.name,
+          role: userData.role,
+          password: hashedPassword,
+        },
+      });
+
+      // If the user is a driver, create a corresponding driver record
+      if (userData.role === 'Driver') {
+        const existingDriver = await prisma.driver.findUnique({
+          where: { userId: user.id },
+        });
+
+        if (!existingDriver) {
+          const now = new Date();
+          const expiry = new Date(now.getTime() + 365 * 24 * 60 * 60 * 1000);
+          await prisma.driver.create({
+            data: {
+              name: userData.name,
+              licenseNumber: `DEMO-LIC-${user.id}`,
+              licenseCategory: 'Class B',
+              licenseExpiry: expiry,
+              status: 'AVAILABLE',
+              safetyScore: 100,
+              userId: user.id,
+            },
+          });
+        }
+      }
+    }
   }
 };
 
