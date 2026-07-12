@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>TransitOps | Driver Management</title>
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<!-- Icons -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "tertiary-fixed": "#d3e4fe",
+                        "inverse-on-surface": "#eff1f3",
+                        "surface-bright": "#f7f9fb",
+                        "on-secondary-fixed-variant": "#3f465c",
+                        "secondary-fixed-dim": "#bec6e0",
+                        "error": "#ba1a1a",
+                        "on-tertiary": "#ffffff",
+                        "surface-tint": "#006a61",
+                        "secondary": "#565e74",
+                        "on-tertiary-fixed": "#0b1c30",
+                        "surface-container-highest": "#e0e3e5",
+                        "outline-variant": "#bcc9c6",
+                        "on-primary-fixed": "#00201d",
+                        "primary": "#00685f",
+                        "tertiary-container": "#66768d",
+                        "background": "#f7f9fb",
+                        "on-tertiary-container": "#fdfcff",
+                        "surface-container-low": "#f2f4f6",
+                        "outline": "#6d7a77",
+                        "secondary-container": "#dae2fd",
+                        "on-primary-container": "#f4fffc",
+                        "tertiary-fixed-dim": "#b7c8e1",
+                        "on-secondary-container": "#5c647a",
+                        "error-container": "#ffdad6",
+                        "inverse-primary": "#6bd8cb",
+                        "surface-dim": "#d8dadc",
+                        "primary-fixed-dim": "#6bd8cb",
+                        "on-error-container": "#93000a",
+                        "on-secondary-fixed": "#131b2e",
+                        "on-primary": "#ffffff",
+                        "surface-container-lowest": "#ffffff",
+                        "surface": "#f7f9fb",
+                        "on-background": "#191c1e",
+                        "on-secondary": "#ffffff",
+                        "on-primary-fixed-variant": "#005049",
+                        "surface-variant": "#e0e3e5",
+                        "tertiary": "#4d5d73",
+                        "on-surface-variant": "#3d4947",
+                        "on-error": "#ffffff",
+                        "on-tertiary-fixed-variant": "#38485d",
+                        "surface-container-high": "#e6e8ea",
+                        "primary-fixed": "#89f5e7",
+                        "surface-container": "#eceef0",
+                        "primary-container": "#008378",
+                        "secondary-fixed": "#dae2fd",
+                        "on-surface": "#191c1e",
+                        "inverse-surface": "#2d3133",
+                        "slate-border": "#E2E8F0",
+                        "teal-brand": "#0D9488"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "xl": "32px",
+                        "gutter": "24px",
+                        "lg": "24px",
+                        "base": "4px",
+                        "margin-mobile": "16px",
+                        "md": "16px",
+                        "sidebar-width": "260px",
+                        "2xl": "48px",
+                        "xs": "4px",
+                        "sm": "8px"
+                    },
+                    "fontFamily": {
+                        "body-md": ["Hanken Grotesk"],
+                        "label-md": ["Hanken Grotesk"],
+                        "headline-md": ["Hanken Grotesk"],
+                        "body-lg": ["Hanken Grotesk"],
+                        "headline-lg": ["Hanken Grotesk"]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        body { font-family: 'Hanken Grotesk', sans-serif; }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .modal-overlay { background-color: rgba(15, 23, 42, 0.4); backdrop-filter: blur(2px); }
+    </style>
+</head>
+<body class="bg-background text-on-surface">
+<!-- Sidebar (Shared Component) -->
+<aside class="docked fixed left-0 top-0 h-full w-[260px] bg-surface-container-lowest border-r border-slate-border flex flex-col p-md overflow-y-auto z-50">
+<div class="mb-xl px-sm">
+<h1 class="font-headline-md text-headline-md font-bold text-primary">TransitOps</h1>
+<p class="text-label-sm text-secondary">Fleet Operations</p>
+</div>
+<nav class="flex-1 space-y-1">
+<a class="flex items-center gap-3 px-sm py-2 text-secondary hover:bg-surface-container-high transition-colors rounded-lg font-body-md" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+                Fleet Overview
+            </a>
+<a class="flex items-center gap-3 px-sm py-2 bg-secondary-container text-on-secondary-container rounded-lg font-bold font-body-md" href="#">
+<span class="material-symbols-outlined">person</span>
+                Driver Schedules
+            </a>
+<a class="flex items-center gap-3 px-sm py-2 text-secondary hover:bg-surface-container-high transition-colors rounded-lg font-body-md" href="#">
+<span class="material-symbols-outlined">location_on</span>
+                Vehicle Tracking
+            </a>
+<a class="flex items-center gap-3 px-sm py-2 text-secondary hover:bg-surface-container-high transition-colors rounded-lg font-body-md" href="#">
+<span class="material-symbols-outlined">build</span>
+                Maintenance Logs
+            </a>
+<a class="flex items-center gap-3 px-sm py-2 text-secondary hover:bg-surface-container-high transition-colors rounded-lg font-body-md" href="#">
+<span class="material-symbols-outlined">analytics</span>
+                Analytics
+            </a>
+<a class="flex items-center gap-3 px-sm py-2 text-secondary hover:bg-surface-container-high transition-colors rounded-lg font-body-md" href="#">
+<span class="material-symbols-outlined">admin_panel_settings</span>
+                Admin Panel
+            </a>
+</nav>
+<div class="mt-auto border-t border-slate-border pt-md space-y-1">
+<a class="flex items-center gap-3 px-sm py-2 text-secondary hover:bg-surface-container-high transition-colors rounded-lg font-body-md" href="#">
+<span class="material-symbols-outlined">settings</span>
+                Settings
+            </a>
+<a class="flex items-center gap-3 px-sm py-2 text-secondary hover:bg-surface-container-high transition-colors rounded-lg font-body-md" href="#">
+<span class="material-symbols-outlined">help_outline</span>
+                Support
+            </a>
+</div>
+</aside>
+<!-- Top Navigation Bar (Shared Component) -->
+<header class="docked sticky top-0 z-40 w-full bg-surface border-b border-slate-border flex justify-between items-center h-16 px-lg ml-[260px] max-w-[calc(100%-260px)]">
+<div class="flex items-center gap-4">
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-secondary text-lg">search</span>
+<input class="bg-surface-container-low border-none rounded-full pl-10 pr-4 py-1.5 text-body-md focus:ring-2 focus:ring-teal-brand w-64" placeholder="Search operations..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="material-symbols-outlined text-secondary hover:text-primary transition-colors">notifications</button>
+<button class="material-symbols-outlined text-secondary hover:text-primary transition-colors">settings</button>
+<button class="bg-teal-brand text-white px-4 py-2 rounded-lg font-label-md hover:opacity-90 transition-opacity">
+                New Dispatch
+            </button>
+<div class="w-8 h-8 rounded-full bg-surface-container-high overflow-hidden border border-slate-border">
+<img class="w-full h-full object-cover" data-alt="Professional headshot of a fleet operations manager in a high-tech control center environment. The lighting is crisp and cool-toned, with a background featuring soft-focus digital displays and dashboard interfaces. The subject is wearing professional attire, exuding a mood of calm authority and expertise." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA802oxO5T8C9t9So8OqHBX2VFc6BloDKgZH2RfuIXFFWmSWCdDJd1g93an-pq7JxqAcsuO9UXzuwFgkUG_XW871Tc5IYDWGhXLmyiYgPCDJtkooj86oGo8DgBzd6uzXp20sXSEovt_pd8v2PHJbQ__eUVTvY3PilA-2RujUtqupWi7EBNbjnUHtRflGCH15YPh5jBLIsQSHPFAOeWv3xA2gi0MKpNf_h9295bN1GwvY5sbHUM_Wr8"/>
+</div>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="ml-[260px] p-lg min-h-[calc(100vh-64px)]">
+<!-- Header & Toolbar -->
+<div class="flex justify-between items-end mb-lg">
+<div>
+<h2 class="font-headline-lg text-headline-lg text-on-surface">Drivers</h2>
+<p class="text-body-md text-secondary">Manage and monitor fleet personnel status and compliance.</p>
+</div>
+<div class="flex items-center gap-3">
+<select class="border-slate-border rounded-lg text-body-md focus:ring-teal-brand focus:border-teal-brand min-w-[160px]">
+<option>All statuses</option>
+<option>Active</option>
+<option>Inactive</option>
+<option>On leave</option>
+<option>Expired license</option>
+</select>
+<button class="bg-teal-brand text-white px-4 py-2 rounded-lg flex items-center gap-2 font-label-md hover:bg-opacity-90 transition-all" onclick="toggleModal('driverModal')">
+<span class="material-symbols-outlined text-[18px]">add</span>
+                    Add driver
+                </button>
+</div>
+</div>
+<!-- Drivers Table Card -->
+<div class="bg-white border border-slate-border rounded-lg overflow-hidden">
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container-low border-b border-slate-border">
+<th class="px-md py-4 text-label-sm text-secondary font-semibold uppercase tracking-wider">Name</th>
+<th class="px-md py-4 text-label-sm text-secondary font-semibold uppercase tracking-wider">License#</th>
+<th class="px-md py-4 text-label-sm text-secondary font-semibold uppercase tracking-wider">Category</th>
+<th class="px-md py-4 text-label-sm text-secondary font-semibold uppercase tracking-wider">Expiry</th>
+<th class="px-md py-4 text-label-sm text-secondary font-semibold uppercase tracking-wider">Contact</th>
+<th class="px-md py-4 text-label-sm text-secondary font-semibold uppercase tracking-wider text-center">Safety score</th>
+<th class="px-md py-4 text-label-sm text-secondary font-semibold uppercase tracking-wider">Status</th>
+<th class="px-md py-4 text-label-sm text-secondary font-semibold uppercase tracking-wider text-right">Actions</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-slate-border">
+<!-- Driver 1: Expired -->
+<tr class="bg-red-50/30 hover:bg-surface-container-high transition-colors cursor-pointer" onclick="toggleModal('driverModal')">
+<td class="px-md py-4">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-slate-200 border border-slate-border overflow-hidden flex-shrink-0">
+<img class="w-full h-full object-cover" data-alt="Close-up portrait of a professional driver, a man in his 40s with a focused expression, wearing a high-visibility vest. The setting is a bright, early morning loading dock with soft, natural sunlight. High-quality digital photography with a crisp, clean corporate aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA0hqPeMFP3900ZfAKHNbnXhs4LmTijns48KYMfiNwnAIKoHlJXN2LmPhorhB3W9oLMjZu1sKrTetSH-6-V2ySoL-te7FJhnzD2bcZy5GePvqjpKHsQhrxgiotyGdgw3L2UZ26U1Tb8Xn_JtBVOfISOgMm7Nm_5cM2I3-7AcjL5OQnRC6ieOla12t66AILTyPZARncGLqZNHHzZZ2-_AD-jHh1GySNtPuTehNhmMwJz6JcONp5_taw"/>
+</div>
+<span class="font-body-md font-semibold text-on-surface">Marcus Thorne</span>
+</div>
+</td>
+<td class="px-md py-4 font-body-md text-secondary">DL-992341</td>
+<td class="px-md py-4"><span class="bg-surface-container border border-slate-border px-2 py-0.5 rounded text-label-sm text-secondary">Class A CDL</span></td>
+<td class="px-md py-4">
+<div class="text-error font-semibold text-body-md">Oct 12, 2023</div>
+<div class="text-label-sm text-error/80">Expired</div>
+</td>
+<td class="px-md py-4 font-body-md text-secondary">+1 (555) 012-4432</td>
+<td class="px-md py-4 text-center font-bold text-headline-md text-primary">94</td>
+<td class="px-md py-4">
+<span class="bg-error/10 text-error px-2 py-1 rounded-full text-label-sm font-semibold border border-error/20">Expired</span>
+</td>
+<td class="px-md py-4 text-right">
+<button class="material-symbols-outlined text-secondary hover:text-error transition-colors p-1" title="Suspend">block</button>
+</td>
+</tr>
+<!-- Driver 2: High Score, Active -->
+<tr class="hover:bg-surface-container-high transition-colors cursor-pointer" onclick="toggleModal('driverModal')">
+<td class="px-md py-4">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-slate-200 border border-slate-border overflow-hidden flex-shrink-0">
+<img class="w-full h-full object-cover" data-alt="A smiling professional female driver in a clean company uniform standing in front of a white logistics truck. The background shows a modern warehouse facility under a clear blue sky. Professional corporate lighting that highlights her friendly and capable demeanor." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDcubanTGO4CjI9HhL5dmiNuhK6dxEiXiUBO_WOCnBEc-ZzC55uEAvN4w3dU8axkHts4m_8XAx9ez_yI-kJGlAjH7MoQcq-rLWI17NudmD-n6RLz2L_8zK998VcFn4uC0ad_zCE0vdHJCtCscKmDIMbGP-w70KOa2oE0gGTYn0pbQhed-TlnfMqiEd-VlaxidhzvW5vbFLRoSfNisGcg0cw-bSJrGY_Psmqnx1vOsbDgg_2WhNAWPs"/>
+</div>
+<span class="font-body-md font-semibold text-on-surface">Elena Rodriguez</span>
+</div>
+</td>
+<td class="px-md py-4 font-body-md text-secondary">DL-772109</td>
+<td class="px-md py-4"><span class="bg-surface-container border border-slate-border px-2 py-0.5 rounded text-label-sm text-secondary">Class B</span></td>
+<td class="px-md py-4">
+<div class="text-on-surface text-body-md font-medium">Jun 14, 2025</div>
+<div class="text-label-sm text-secondary">420 days remaining</div>
+</td>
+<td class="px-md py-4 font-body-md text-secondary">+1 (555) 012-9981</td>
+<td class="px-md py-4 text-center font-bold text-headline-md text-primary">98</td>
+<td class="px-md py-4">
+<span class="bg-teal-brand/10 text-teal-brand px-2 py-1 rounded-full text-label-sm font-semibold border border-teal-brand/20">Active</span>
+</td>
+<td class="px-md py-4 text-right">
+<button class="material-symbols-outlined text-secondary hover:text-error transition-colors p-1" title="Suspend">block</button>
+</td>
+</tr>
+<!-- Driver 3: Low Score -->
+<tr class="hover:bg-surface-container-high transition-colors cursor-pointer" onclick="toggleModal('driverModal')">
+<td class="px-md py-4">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-slate-200 border border-slate-border overflow-hidden flex-shrink-0">
+<img class="w-full h-full object-cover" data-alt="Close-up headshot of a younger male delivery driver wearing a company polo shirt. He is situated in the driver's seat of a modern van, with soft light coming through the side window. Minimalist and clean aesthetic consistent with a professional operations dashboard." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCRRLmS6d8zgOKI2DEUy5s0piyfNbgP-jQUW3cjDnBix2tkLRpFJGPh4JxgxxBEVl_JGxIZZrymixAvKtH2_jFuaj3dJpRsUpZQ1qHzKkc_rmDmLod2X13mhHGbxeJGYT3Xp0SVzc9O3x7yKBEvDTNiH1PWgymTJYCUClYaSuCNhSMEFbooIOzLxQKTB1G6f_47dIW1Fs5IMD8IgWIwYnNKcioeyBQp0PIdBzJ5T2ppbXnSqUwHcoU"/>
+</div>
+<span class="font-body-md font-semibold text-on-surface">Jordan Smith</span>
+</div>
+</td>
+<td class="px-md py-4 font-body-md text-secondary">DL-114402</td>
+<td class="px-md py-4"><span class="bg-surface-container border border-slate-border px-2 py-0.5 rounded text-label-sm text-secondary">Class A CDL</span></td>
+<td class="px-md py-4">
+<div class="text-on-surface text-body-md font-medium">Dec 02, 2024</div>
+<div class="text-label-sm text-secondary">226 days remaining</div>
+</td>
+<td class="px-md py-4 font-body-md text-secondary">+1 (555) 012-1123</td>
+<td class="px-md py-4 text-center font-bold text-headline-md text-error">64</td>
+<td class="px-md py-4">
+<span class="bg-amber-100 text-amber-700 px-2 py-1 rounded-full text-label-sm font-semibold border border-amber-200">Monitoring</span>
+</td>
+<td class="px-md py-4 text-right">
+<button class="material-symbols-outlined text-secondary hover:text-error transition-colors p-1" title="Suspend">block</button>
+</td>
+</tr>
+<!-- Driver 4: Amber Score -->
+<tr class="hover:bg-surface-container-high transition-colors cursor-pointer" onclick="toggleModal('driverModal')">
+<td class="px-md py-4">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-slate-200 border border-slate-border overflow-hidden flex-shrink-0">
+<img class="w-full h-full object-cover" data-alt="A portrait of a senior driver with graying hair and glasses, looking professional and calm. He is wearing a dark blue zip-up jacket. The lighting is soft and directional, creating a sense of reliability and seasoned experience within the logistics industry." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAqJPe4tmexMNFXpvKBYNnOcaEUmHFkP2D4n56qeuCaYinPKpIk-mSz-1UwD7KYY_Vdc-SoU7Kp_cATsD6WNbUPSmZeC5t1M8JxwRdPzcZWwBADMh3euQDtpLLUI34udv7SFrqX2MikFXkFul7ggaY10Jk505sy9MqPN0oANhDvE-4jvoh3BRs8OyFESSBgwjycqCuMmPTpDsBmY-SD4r1JKWAOXmiNMV98aixd0ar0cv0814C3PIA"/>
+</div>
+<span class="font-body-md font-semibold text-on-surface">Thomas Chen</span>
+</div>
+</td>
+<td class="px-md py-4 font-body-md text-secondary">DL-552199</td>
+<td class="px-md py-4"><span class="bg-surface-container border border-slate-border px-2 py-0.5 rounded text-label-sm text-secondary">Class B</span></td>
+<td class="px-md py-4">
+<div class="text-on-surface text-body-md font-medium">Mar 20, 2025</div>
+<div class="text-label-sm text-secondary">334 days remaining</div>
+</td>
+<td class="px-md py-4 font-body-md text-secondary">+1 (555) 012-7766</td>
+<td class="px-md py-4 text-center font-bold text-headline-md text-amber-600">82</td>
+<td class="px-md py-4">
+<span class="bg-teal-brand/10 text-teal-brand px-2 py-1 rounded-full text-label-sm font-semibold border border-teal-brand/20">Active</span>
+</td>
+<td class="px-md py-4 text-right">
+<button class="material-symbols-outlined text-secondary hover:text-error transition-colors p-1" title="Suspend">block</button>
+</td>
+</tr>
+<!-- Driver 5: Active -->
+<tr class="hover:bg-surface-container-high transition-colors cursor-pointer" onclick="toggleModal('driverModal')">
+<td class="px-md py-4">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-slate-200 border border-slate-border overflow-hidden flex-shrink-0">
+<img class="w-full h-full object-cover" data-alt="Professional headshot of a middle-aged woman in a logistics company shirt, smiling slightly. The background is a clean, white-walled office corridor with bright, even lighting. The style is utilitarian and professional, perfectly suited for a driver management dashboard." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBI0C3azOGqBf3Ec0nP5GBM-BobfQzjGzp0DFHB11Q9w2s_Gyo1T6ErhFjfUYpSYYTmzws-o1U3GSED-OmuvtVTCOA3GSosKTQX5avLAZHsS-vJ2b22WZfuNjmrfqhBPP3wiaknfQBtlicHB7x6RmssSKXt5mtuccDewAdhITSvVKdZFdp1AragTaJvZKO3kGQE_RhKS1xvAWJPvVy0H6wwgewJ9wP67aEhKkGYozrTbS0pn_FfenM"/>
+</div>
+<span class="font-body-md font-semibold text-on-surface">Sarah Jenkins</span>
+</div>
+</td>
+<td class="px-md py-4 font-body-md text-secondary">DL-001283</td>
+<td class="px-md py-4"><span class="bg-surface-container border border-slate-border px-2 py-0.5 rounded text-label-sm text-secondary">Class A CDL</span></td>
+<td class="px-md py-4">
+<div class="text-on-surface text-body-md font-medium">Nov 11, 2024</div>
+<div class="text-label-sm text-secondary">205 days remaining</div>
+</td>
+<td class="px-md py-4 font-body-md text-secondary">+1 (555) 012-0033</td>
+<td class="px-md py-4 text-center font-bold text-headline-md text-primary">91</td>
+<td class="px-md py-4">
+<span class="bg-teal-brand/10 text-teal-brand px-2 py-1 rounded-full text-label-sm font-semibold border border-teal-brand/20">Active</span>
+</td>
+<td class="px-md py-4 text-right">
+<button class="material-symbols-outlined text-secondary hover:text-error transition-colors p-1" title="Suspend">block</button>
+</td>
+</tr>
+<!-- Driver 6: On Leave -->
+<tr class="hover:bg-surface-container-high transition-colors cursor-pointer" onclick="toggleModal('driverModal')">
+<td class="px-md py-4">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-slate-200 border border-slate-border overflow-hidden flex-shrink-0">
+<img class="w-full h-full object-cover" data-alt="Headshot of a friendly-looking man with short dark hair, wearing a casual professional shirt. The background is a blurred cityscape during a bright overcast day. The mood is approachable and professional, focusing on human-centric fleet management data." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCmMxGdOnEzc33GrKI29esOZ7o-pTDidn1r9jNGrppt5JorzL75Sa62tc6pom2c8u0k--49-71Oq6yWtjgvMzZ47j0Hb9oyOhHqD6LQGtKbc4mBViRbd7LOVPufb6TAjJBq-1V9gdoxXs94N3A_IRHoselTVNB-oKA3fK95YmfzkVYQUyGOuqGWvYeBeiTw1NTnzt_GNJ5XtnzmrQsO8PaaD4OTsLVHEWR-bhBE4uJDnYOKkFimDC0"/>
+</div>
+<span class="font-body-md font-semibold text-on-surface">David Okafor</span>
+</div>
+</td>
+<td class="px-md py-4 font-body-md text-secondary">DL-883341</td>
+<td class="px-md py-4"><span class="bg-surface-container border border-slate-border px-2 py-0.5 rounded text-label-sm text-secondary">Class B</span></td>
+<td class="px-md py-4">
+<div class="text-on-surface text-body-md font-medium">Jan 30, 2025</div>
+<div class="text-label-sm text-secondary">285 days remaining</div>
+</td>
+<td class="px-md py-4 font-body-md text-secondary">+1 (555) 012-5544</td>
+<td class="px-md py-4 text-center font-bold text-headline-md text-amber-600">88</td>
+<td class="px-md py-4">
+<span class="bg-surface-container text-secondary px-2 py-1 rounded-full text-label-sm font-semibold border border-slate-border">On leave</span>
+</td>
+<td class="px-md py-4 text-right">
+<button class="material-symbols-outlined text-secondary hover:text-error transition-colors p-1" title="Suspend">block</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="px-md py-4 border-t border-slate-border bg-surface-container-lowest flex items-center justify-between">
+<span class="text-body-md text-secondary">Showing 6 of 142 drivers</span>
+<div class="flex items-center gap-2">
+<button class="px-3 py-1 border border-slate-border rounded hover:bg-surface-container transition-colors text-label-md">Previous</button>
+<button class="px-3 py-1 border border-teal-brand bg-teal-brand text-white rounded text-label-md">1</button>
+<button class="px-3 py-1 border border-slate-border rounded hover:bg-surface-container transition-colors text-label-md">2</button>
+<button class="px-3 py-1 border border-slate-border rounded hover:bg-surface-container transition-colors text-label-md">3</button>
+<button class="px-3 py-1 border border-slate-border rounded hover:bg-surface-container transition-colors text-label-md">Next</button>
+</div>
+</div>
+</div>
+</main>
+<!-- Modal: Add/Edit Driver -->
+<div class="fixed inset-0 z-[60] flex items-center justify-center hidden" id="driverModal">
+<div class="modal-overlay absolute inset-0" onclick="toggleModal('driverModal')"></div>
+<div class="bg-white rounded-lg border border-slate-border w-full max-w-2xl relative shadow-none animate-in fade-in zoom-in duration-200">
+<div class="px-lg py-md border-b border-slate-border flex justify-between items-center">
+<h3 class="font-headline-md text-headline-md">Add new driver</h3>
+<button class="material-symbols-outlined text-secondary hover:text-on-surface" onclick="toggleModal('driverModal')">close</button>
+</div>
+<form class="p-lg">
+<div class="grid grid-cols-2 gap-lg">
+<!-- Column 1 -->
+<div class="space-y-md">
+<div>
+<label class="block text-label-sm font-semibold text-secondary mb-1">Full name</label>
+<input class="w-full border-slate-border rounded-lg text-body-md focus:ring-teal-brand focus:border-teal-brand p-2.5" placeholder="e.g. Marcus Thorne" type="text"/>
+</div>
+<div>
+<label class="block text-label-sm font-semibold text-secondary mb-1">License number</label>
+<input class="w-full border-slate-border rounded-lg text-body-md focus:ring-teal-brand focus:border-teal-brand p-2.5" placeholder="DL-000000" type="text"/>
+</div>
+<div>
+<label class="block text-label-sm font-semibold text-secondary mb-1">Category</label>
+<select class="w-full border-slate-border rounded-lg text-body-md focus:ring-teal-brand focus:border-teal-brand p-2.5">
+<option>Class A CDL</option>
+<option>Class B</option>
+<option>Class C</option>
+<option>Hazmat Certified</option>
+</select>
+</div>
+</div>
+<!-- Column 2 -->
+<div class="space-y-md">
+<div>
+<label class="block text-label-sm font-semibold text-secondary mb-1">Contact number</label>
+<input class="w-full border-slate-border rounded-lg text-body-md focus:ring-teal-brand focus:border-teal-brand p-2.5" placeholder="+1 (000) 000-0000" type="tel"/>
+</div>
+<div>
+<label class="block text-label-sm font-semibold text-secondary mb-1">License expiry date</label>
+<input class="w-full border-slate-border rounded-lg text-body-md focus:ring-teal-brand focus:border-teal-brand p-2.5" type="date"/>
+</div>
+<div class="flex gap-md">
+<div class="flex-1">
+<label class="block text-label-sm font-semibold text-secondary mb-1">Safety score</label>
+<input class="w-full border-slate-border rounded-lg text-body-md focus:ring-teal-brand focus:border-teal-brand p-2.5" max="100" min="0" placeholder="0-100" type="number"/>
+</div>
+<div class="flex-1">
+<label class="block text-label-sm font-semibold text-secondary mb-1">Initial status</label>
+<select class="w-full border-slate-border rounded-lg text-body-md focus:ring-teal-brand focus:border-teal-brand p-2.5">
+<option>Active</option>
+<option>Inactive</option>
+<option>On leave</option>
+</select>
+</div>
+</div>
+</div>
+</div>
+<div class="mt-xl pt-lg border-t border-slate-border flex justify-end gap-md">
+<button class="px-6 py-2 border border-slate-border text-on-surface hover:bg-surface-container rounded-lg text-label-md transition-colors" onclick="toggleModal('driverModal')" type="button">
+                        Cancel
+                    </button>
+<button class="px-6 py-2 bg-teal-brand text-white font-semibold rounded-lg text-label-md hover:bg-opacity-90 transition-all shadow-sm" type="submit">
+                        Create driver profile
+                    </button>
+</div>
+</form>
+</div>
+</div>
+<script>
+        function toggleModal(id) {
+            const modal = document.getElementById(id);
+            if (modal.classList.contains('hidden')) {
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+                document.body.classList.add('overflow-hidden');
+            } else {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+                document.body.classList.remove('overflow-hidden');
+            }
+        }
+
+        // Close on ESC
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                const openModals = document.querySelectorAll('.fixed.flex');
+                openModals.forEach(m => toggleModal(m.id));
+            }
+        });
+    </script>
+</body></html>

@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Vehicle Registry | TransitOps</title>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Google Fonts: Hanken Grotesk -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:ital,wght@0,100..900;1,100..900&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "tertiary-fixed-dim": "#b7c8e1",
+                        "surface-bright": "#f7f9fb",
+                        "on-secondary-fixed-variant": "#3f465c",
+                        "background": "#f7f9fb",
+                        "surface-container-highest": "#e0e3e5",
+                        "on-surface-variant": "#3d4947",
+                        "secondary-fixed-dim": "#bec6e0",
+                        "on-surface": "#191c1e",
+                        "surface-variant": "#e0e3e5",
+                        "on-tertiary-fixed-variant": "#38485d",
+                        "primary": "#00685f",
+                        "surface-tint": "#006a61",
+                        "tertiary-container": "#66768d",
+                        "surface-container-high": "#e6e8ea",
+                        "primary-fixed-dim": "#6bd8cb",
+                        "on-primary": "#ffffff",
+                        "secondary-fixed": "#dae2fd",
+                        "primary-container": "#008378",
+                        "on-error": "#ffffff",
+                        "on-tertiary": "#ffffff",
+                        "secondary": "#565e74",
+                        "outline-variant": "#bcc9c6",
+                        "on-primary-fixed-variant": "#005049",
+                        "on-tertiary-container": "#fdfcff",
+                        "inverse-surface": "#2d3133",
+                        "primary-fixed": "#89f5e7",
+                        "error": "#ba1a1a",
+                        "inverse-primary": "#6bd8cb",
+                        "surface-dim": "#d8dadc",
+                        "on-primary-container": "#f4fffc",
+                        "inverse-on-surface": "#eff1f3",
+                        "secondary-container": "#dae2fd",
+                        "on-secondary-container": "#5c647a",
+                        "outline": "#6d7a77",
+                        "error-container": "#ffdad6",
+                        "surface": "#f7f9fb",
+                        "surface-container": "#eceef0",
+                        "on-primary-fixed": "#00201d",
+                        "on-error-container": "#93000a",
+                        "tertiary-fixed": "#d3e4fe",
+                        "tertiary": "#4d5d73",
+                        "on-secondary-fixed": "#131b2e",
+                        "on-tertiary-fixed": "#0b1c30",
+                        "surface-container-low": "#f2f4f6",
+                        "on-secondary": "#ffffff",
+                        "on-background": "#191c1e",
+                        "surface-container-lowest": "#ffffff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "xs": "4px",
+                        "lg": "24px",
+                        "sm": "8px",
+                        "md": "16px",
+                        "margin-mobile": "16px",
+                        "xl": "32px",
+                        "sidebar-width": "260px",
+                        "base": "4px",
+                        "2xl": "48px",
+                        "gutter": "24px"
+                    },
+                    "fontFamily": {
+                        "body-md": ["Hanken Grotesk"],
+                        "label-sm": ["Hanken Grotesk"],
+                        "headline-md": ["Hanken Grotesk"],
+                        "headline-lg": ["Hanken Grotesk"],
+                        "display": ["Hanken Grotesk"],
+                        "label-md": ["Hanken Grotesk"],
+                        "headline-lg-mobile": ["Hanken Grotesk"],
+                        "body-lg": ["Hanken Grotesk"]
+                    },
+                    "fontSize": {
+                        "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "label-sm": ["11px", {"lineHeight": "14px", "letterSpacing": "0.03em", "fontWeight": "500"}],
+                        "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "500"}],
+                        "headline-lg": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "500"}],
+                        "display": ["30px", {"lineHeight": "36px", "letterSpacing": "-0.02em", "fontWeight": "500"}],
+                        "label-md": ["12px", {"lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "500"}],
+                        "headline-lg-mobile": ["20px", {"lineHeight": "28px", "fontWeight": "500"}],
+                        "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Hanken Grotesk', sans-serif;
+            background-color: #f7f9fb;
+            color: #191c1e;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        /* Custom scrollbar for fleet lists */
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    </style>
+</head>
+<body class="font-body-md text-body-md">
+<!-- Sidebar Navigation Shell -->
+<aside class="fixed h-full w-[260px] left-0 top-0 bg-inverse-surface dark:bg-inverse-surface flex flex-col border-r border-outline-variant z-40">
+<div class="p-lg">
+<h1 class="font-headline-md text-headline-md font-bold text-white tracking-tight">TransitOps</h1>
+<p class="text-secondary-fixed-dim text-label-md opacity-70">Fleet Operations</p>
+</div>
+<nav class="flex-1 px-sm space-y-xs">
+<a class="flex items-center gap-md px-md py-sm rounded transition-colors text-secondary-fixed-dim hover:text-white hover:bg-secondary-fixed-variant" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-body-md">Fleet Overview</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm rounded transition-colors text-primary-fixed bg-on-primary-fixed-variant border-r-4 border-primary-fixed" href="#">
+<span class="material-symbols-outlined" data-icon="location_on">location_on</span>
+<span class="font-body-md">Vehicle Tracking</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm rounded transition-colors text-secondary-fixed-dim hover:text-white hover:bg-secondary-fixed-variant" href="#">
+<span class="material-symbols-outlined" data-icon="build">build</span>
+<span class="font-body-md">Maintenance Logs</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm rounded transition-colors text-secondary-fixed-dim hover:text-white hover:bg-secondary-fixed-variant" href="#">
+<span class="material-symbols-outlined" data-icon="calendar_today">calendar_today</span>
+<span class="font-body-md">Driver Schedules</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm rounded transition-colors text-secondary-fixed-dim hover:text-white hover:bg-secondary-fixed-variant" href="#">
+<span class="material-symbols-outlined" data-icon="bar_chart">bar_chart</span>
+<span class="font-body-md">Analytics</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm rounded transition-colors text-secondary-fixed-dim hover:text-white hover:bg-secondary-fixed-variant" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="font-body-md">Admin Panel</span>
+</a>
+</nav>
+<div class="p-sm mt-auto border-t border-white/10">
+<a class="flex items-center gap-md px-md py-sm rounded text-secondary-fixed-dim hover:text-white transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="help">help</span>
+<span class="font-body-md">Help Support</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm rounded text-secondary-fixed-dim hover:text-white transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="logout">logout</span>
+<span class="font-body-md">Log Out</span>
+</a>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="ml-[260px] min-h-screen flex flex-col">
+<!-- Top Navigation Bar -->
+<header class="flex justify-between items-center h-16 px-lg bg-surface border-b border-outline-variant sticky top-0 z-30">
+<div class="flex items-center gap-lg">
+<h2 class="font-headline-md text-headline-md font-bold text-primary">Fleet Operations</h2>
+<div class="relative flex items-center">
+<span class="material-symbols-outlined absolute left-3 text-outline" data-icon="search">search</span>
+<input class="pl-10 pr-4 py-2 bg-surface-container-low border border-outline-variant rounded-lg focus:outline-none focus:border-primary text-body-md w-64" placeholder="Search registry..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-md">
+<button class="p-2 hover:bg-surface-container-low rounded-full transition-all duration-200">
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="notifications">notifications</span>
+</button>
+<button class="p-2 hover:bg-surface-container-low rounded-full transition-all duration-200">
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="settings">settings</span>
+</button>
+<div class="h-8 w-[1px] bg-outline-variant mx-sm"></div>
+<button class="px-md py-2 bg-primary text-on-primary rounded-lg font-label-md hover:bg-primary-container transition-all">New Dispatch</button>
+<img class="w-8 h-8 rounded-full border border-outline-variant object-cover" data-alt="A professional headshot of a fleet manager in a clean corporate office environment, soft natural lighting, high resolution, minimalist aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD8gz-x-l-fl1-xCn-IlWWGo78_FD8zn86PF2jN0XuP3a_f5QsaR8sFAtu-3FWM9Hh4pvM6qFRHJ93k38YHiSrklezyGG08CLoBGm4MoKa-FIZoY6z-U6gD5v_k-GkhKoOpyI_Vi2GVbz5uBxyU0GFzWIEjb4CcglmZ1pgi6d4j-sEBaUrJuYw1SqMkO95Z7Rm-Zjt7OxIKucpil0qjKj3d22AVE1HR6etYeNNgcEUWphFZFRs3UHU"/>
+</div>
+</header>
+<!-- Page Header & Toolbar -->
+<section class="p-lg space-y-lg">
+<div class="flex justify-between items-end">
+<div>
+<nav class="flex text-label-md text-outline mb-1 gap-1">
+<span>Fleet</span>
+<span>/</span>
+<span class="text-on-surface">Vehicles</span>
+</nav>
+<h3 class="font-headline-lg text-headline-lg text-on-surface">Vehicles</h3>
+</div>
+<button class="bg-[#0D9488] text-white px-lg py-sm rounded-lg font-label-md flex items-center gap-2 hover:opacity-90 transition-opacity" onclick="document.getElementById('addModal').classList.remove('hidden')">
+<span class="material-symbols-outlined text-sm" data-icon="add">add</span>
+                    Add Vehicle
+                </button>
+</div>
+<!-- Toolbar: Filters -->
+<div class="flex justify-between items-center bg-white p-md border border-outline-variant rounded-lg">
+<div class="flex gap-md">
+<div class="flex flex-col gap-xs">
+<label class="text-label-sm text-outline uppercase tracking-wider">Status</label>
+<select class="bg-surface-container-lowest border border-outline-variant rounded-md px-md py-1 text-body-md focus:border-primary focus:ring-0">
+<option>All Statuses</option>
+<option>Available</option>
+<option>On Trip</option>
+<option>In Shop</option>
+<option>Retired</option>
+</select>
+</div>
+<div class="flex flex-col gap-xs">
+<label class="text-label-sm text-outline uppercase tracking-wider">Type</label>
+<select class="bg-surface-container-lowest border border-outline-variant rounded-md px-md py-1 text-body-md focus:border-primary focus:ring-0">
+<option>All Types</option>
+<option>Heavy Truck</option>
+<option>Panel Van</option>
+<option>Transit Van</option>
+</select>
+</div>
+<div class="flex flex-col gap-xs">
+<label class="text-label-sm text-outline uppercase tracking-wider">Region</label>
+<select class="bg-surface-container-lowest border border-outline-variant rounded-md px-md py-1 text-body-md focus:border-primary focus:ring-0">
+<option>All Regions</option>
+<option>North</option>
+<option>South-East</option>
+<option>Central</option>
+</select>
+</div>
+</div>
+<div class="flex items-center gap-sm">
+<span class="text-label-md text-outline">Showing 6 of 142 vehicles</span>
+</div>
+</div>
+<!-- Vehicle Table -->
+<div class="bg-white border border-outline-variant rounded-lg overflow-hidden">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container-low border-b border-outline-variant">
+<th class="px-lg py-md text-label-md text-outline font-medium">Reg#</th>
+<th class="px-lg py-md text-label-md text-outline font-medium">Name</th>
+<th class="px-lg py-md text-label-md text-outline font-medium">Type</th>
+<th class="px-lg py-md text-label-md text-outline font-medium">Max Load</th>
+<th class="px-lg py-md text-label-md text-outline font-medium">Odometer</th>
+<th class="px-lg py-md text-label-md text-outline font-medium">Status</th>
+<th class="px-lg py-md text-label-md text-outline font-medium text-right">Actions</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant">
+<!-- Vehicle 1: Available -->
+<tr class="hover:bg-surface-container-low transition-colors cursor-pointer group" onclick="document.getElementById('editModal').classList.remove('hidden')">
+<td class="px-lg py-md font-medium text-primary">TX-9902</td>
+<td class="px-lg py-md">Silverstone Titan</td>
+<td class="px-lg py-md text-on-surface-variant">Heavy Truck</td>
+<td class="px-lg py-md text-on-surface-variant">12,500 kg</td>
+<td class="px-lg py-md text-on-surface-variant">42,310 km</td>
+<td class="px-lg py-md">
+<span class="bg-green-100 text-green-900 px-sm py-xs rounded text-[11px] font-bold uppercase tracking-wider">Available</span>
+</td>
+<td class="px-lg py-md text-right">
+<button class="p-1 text-outline hover:text-error transition-colors">
+<span class="material-symbols-outlined" data-icon="archive">archive</span>
+</button>
+</td>
+</tr>
+<!-- Vehicle 2: On Trip -->
+<tr class="hover:bg-surface-container-low transition-colors cursor-pointer group" onclick="document.getElementById('editModal').classList.remove('hidden')">
+<td class="px-lg py-md font-medium text-primary">TX-4188</td>
+<td class="px-lg py-md">Atlas Carrier</td>
+<td class="px-lg py-md text-on-surface-variant">Panel Van</td>
+<td class="px-lg py-md text-on-surface-variant">3,200 kg</td>
+<td class="px-lg py-md text-on-surface-variant">118,502 km</td>
+<td class="px-lg py-md">
+<span class="bg-blue-100 text-blue-900 px-sm py-xs rounded text-[11px] font-bold uppercase tracking-wider">On Trip</span>
+</td>
+<td class="px-lg py-md text-right">
+<button class="p-1 text-outline hover:text-error transition-colors">
+<span class="material-symbols-outlined" data-icon="archive">archive</span>
+</button>
+</td>
+</tr>
+<!-- Vehicle 3: In Shop -->
+<tr class="hover:bg-surface-container-low transition-colors cursor-pointer group" onclick="document.getElementById('editModal').classList.remove('hidden')">
+<td class="px-lg py-md font-medium text-primary">TX-0021</td>
+<td class="px-lg py-md">Mercury Transit</td>
+<td class="px-lg py-md text-on-surface-variant">Transit Van</td>
+<td class="px-lg py-md text-on-surface-variant">2,100 kg</td>
+<td class="px-lg py-md text-on-surface-variant">256,001 km</td>
+<td class="px-lg py-md">
+<span class="bg-amber-100 text-amber-900 px-sm py-xs rounded text-[11px] font-bold uppercase tracking-wider">In Shop</span>
+</td>
+<td class="px-lg py-md text-right">
+<button class="p-1 text-outline hover:text-error transition-colors">
+<span class="material-symbols-outlined" data-icon="archive">archive</span>
+</button>
+</td>
+</tr>
+<!-- Vehicle 4: Available -->
+<tr class="hover:bg-surface-container-low transition-colors cursor-pointer group" onclick="document.getElementById('editModal').classList.remove('hidden')">
+<td class="px-lg py-md font-medium text-primary">TX-5512</td>
+<td class="px-lg py-md">Nordic Hauler</td>
+<td class="px-lg py-md text-on-surface-variant">Heavy Truck</td>
+<td class="px-lg py-md text-on-surface-variant">14,000 kg</td>
+<td class="px-lg py-md text-on-surface-variant">12,400 km</td>
+<td class="px-lg py-md">
+<span class="bg-green-100 text-green-900 px-sm py-xs rounded text-[11px] font-bold uppercase tracking-wider">Available</span>
+</td>
+<td class="px-lg py-md text-right">
+<button class="p-1 text-outline hover:text-error transition-colors">
+<span class="material-symbols-outlined" data-icon="archive">archive</span>
+</button>
+</td>
+</tr>
+<!-- Vehicle 5: Retired -->
+<tr class="hover:bg-surface-container-low transition-colors cursor-pointer group opacity-60 bg-surface-dim/20" onclick="document.getElementById('editModal').classList.remove('hidden')">
+<td class="px-lg py-md font-medium text-primary">TX-0001</td>
+<td class="px-lg py-md">Legacy Line</td>
+<td class="px-lg py-md text-on-surface-variant">Panel Van</td>
+<td class="px-lg py-md text-on-surface-variant">3,000 kg</td>
+<td class="px-lg py-md text-on-surface-variant">502,331 km</td>
+<td class="px-lg py-md">
+<span class="bg-gray-200 text-gray-700 px-sm py-xs rounded text-[11px] font-bold uppercase tracking-wider">Retired</span>
+</td>
+<td class="px-lg py-md text-right">
+<button class="p-1 text-outline hover:text-error transition-colors">
+<span class="material-symbols-outlined" data-icon="archive">archive</span>
+</button>
+</td>
+</tr>
+<!-- Vehicle 6: In Shop -->
+<tr class="hover:bg-surface-container-low transition-colors cursor-pointer group" onclick="document.getElementById('editModal').classList.remove('hidden')">
+<td class="px-lg py-md font-medium text-primary">TX-7712</td>
+<td class="px-lg py-md">Apex Mover</td>
+<td class="px-lg py-md text-on-surface-variant">Heavy Truck</td>
+<td class="px-lg py-md text-on-surface-variant">11,800 kg</td>
+<td class="px-lg py-md text-on-surface-variant">88,290 km</td>
+<td class="px-lg py-md">
+<span class="bg-amber-100 text-amber-900 px-sm py-xs rounded text-[11px] font-bold uppercase tracking-wider">In Shop</span>
+</td>
+<td class="px-lg py-md text-right">
+<button class="p-1 text-outline hover:text-error transition-colors">
+<span class="material-symbols-outlined" data-icon="archive">archive</span>
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+</main>
+<!-- Edit Modal (Visible by default for design demonstration) -->
+<div class="fixed inset-0 z-50 flex items-center justify-center p-xl bg-on-surface/40 backdrop-blur-sm" id="editModal">
+<div class="bg-white w-full max-w-2xl rounded-lg border border-outline-variant overflow-hidden flex flex-col">
+<div class="px-lg py-md border-b border-outline-variant flex justify-between items-center bg-surface-bright">
+<h4 class="font-headline-md text-headline-md">Edit vehicle: TX-9902</h4>
+<button class="p-1 hover:bg-surface-container-low rounded-full" onclick="document.getElementById('editModal').classList.add('hidden')">
+<span class="material-symbols-outlined" data-icon="close">close</span>
+</button>
+</div>
+<div class="p-lg grid grid-cols-2 gap-lg">
+<div class="flex flex-col gap-xs">
+<label class="text-label-sm text-outline uppercase">Reg number</label>
+<input class="border border-outline-variant rounded-lg px-md py-sm focus:border-primary focus:ring-0" type="text" value="TX-9902"/>
+</div>
+<div class="flex flex-col gap-xs">
+<label class="text-label-sm text-outline uppercase">Name</label>
+<input class="border border-outline-variant rounded-lg px-md py-sm focus:border-primary focus:ring-0" type="text" value="Silverstone Titan"/>
+</div>
+<div class="flex flex-col gap-xs">
+<label class="text-label-sm text-outline uppercase">Type</label>
+<select class="border border-outline-variant rounded-lg px-md py-sm focus:border-primary focus:ring-0">
+<option selected="">Heavy Truck</option>
+<option>Panel Van</option>
+<option>Transit Van</option>
+</select>
+</div>
+<div class="flex flex-col gap-xs">
+<label class="text-label-sm text-outline uppercase">Max load (kg)</label>
+<input class="border border-outline-variant rounded-lg px-md py-sm focus:border-primary focus:ring-0" type="number" value="12500"/>
+</div>
+<div class="flex flex-col gap-xs">
+<label class="text-label-sm text-outline uppercase">Odometer (km)</label>
+<input class="border border-outline-variant rounded-lg px-md py-sm focus:border-primary focus:ring-0" type="number" value="42310"/>
+</div>
+<div class="flex flex-col gap-xs">
+<label class="text-label-sm text-outline uppercase">Acquisition cost</label>
+<div class="relative">
+<span class="absolute left-3 top-2.5 text-outline text-body-md">$</span>
+<input class="border border-outline-variant rounded-lg pl-8 pr-md py-sm w-full focus:border-primary focus:ring-0" type="text" value="84,500.00"/>
+</div>
+</div>
+<div class="flex flex-col gap-xs">
+<label class="text-label-sm text-outline uppercase">Region</label>
+<select class="border border-outline-variant rounded-lg px-md py-sm focus:border-primary focus:ring-0">
+<option selected="">Central</option>
+<option>North</option>
+<option>South-East</option>
+</select>
+</div>
+<div class="flex flex-col gap-xs">
+<label class="text-label-sm text-outline uppercase">Status (Read-only)</label>
+<div class="bg-surface-container-low border border-outline-variant rounded-lg px-md py-sm text-on-surface-variant flex items-center gap-2">
+<div class="w-2 h-2 rounded-full bg-green-500"></div>
+                        Available
+                    </div>
+</div>
+</div>
+<div class="px-lg py-md border-t border-outline-variant bg-surface-bright flex justify-end gap-md">
+<button class="px-lg py-sm border border-outline-variant rounded-lg text-on-surface-variant font-label-md hover:bg-surface-container-low transition-colors" onclick="document.getElementById('editModal').classList.add('hidden')">Cancel</button>
+<button class="px-lg py-sm bg-[#0D9488] text-white rounded-lg font-label-md hover:opacity-90 transition-opacity" onclick="this.innerHTML='Updating...'; setTimeout(() =&gt; { document.getElementById('editModal').classList.add('hidden'); this.innerHTML='Save vehicle' }, 1000)">Save vehicle</button>
+</div>
+</div>
+</div>
+<!-- Hidden Add Modal Template -->
+<div class="fixed inset-0 z-50 flex items-center justify-center p-xl bg-on-surface/40 backdrop-blur-sm hidden" id="addModal">
+<div class="bg-white w-full max-w-2xl rounded-lg border border-outline-variant overflow-hidden flex flex-col">
+<div class="px-lg py-md border-b border-outline-variant flex justify-between items-center bg-surface-bright">
+<h4 class="font-headline-md text-headline-md">Register new vehicle</h4>
+<button class="p-1 hover:bg-surface-container-low rounded-full" onclick="document.getElementById('addModal').classList.add('hidden')">
+<span class="material-symbols-outlined" data-icon="close">close</span>
+</button>
+</div>
+<div class="p-lg grid grid-cols-2 gap-lg">
+<div class="flex flex-col gap-xs">
+<label class="text-label-sm text-outline uppercase">Reg number</label>
+<input class="border border-outline-variant rounded-lg px-md py-sm focus:border-primary focus:ring-0" placeholder="TX-0000" type="text"/>
+</div>
+<div class="flex flex-col gap-xs">
+<label class="text-label-sm text-outline uppercase">Name</label>
+<input class="border border-outline-variant rounded-lg px-md py-sm focus:border-primary focus:ring-0" placeholder="e.g. Atlas Carrier" type="text"/>
+</div>
+<div class="flex flex-col gap-xs">
+<label class="text-label-sm text-outline uppercase">Type</label>
+<select class="border border-outline-variant rounded-lg px-md py-sm focus:border-primary focus:ring-0">
+<option>Heavy Truck</option>
+<option>Panel Van</option>
+<option>Transit Van</option>
+</select>
+</div>
+<div class="flex flex-col gap-xs">
+<label class="text-label-sm text-outline uppercase">Max load (kg)</label>
+<input class="border border-outline-variant rounded-lg px-md py-sm focus:border-primary focus:ring-0" type="number"/>
+</div>
+<div class="flex flex-col gap-xs">
+<label class="text-label-sm text-outline uppercase">Initial Odometer</label>
+<input class="border border-outline-variant rounded-lg px-md py-sm focus:border-primary focus:ring-0" placeholder="0" type="number"/>
+</div>
+<div class="flex flex-col gap-xs">
+<label class="text-label-sm text-outline uppercase">Acquisition cost</label>
+<input class="border border-outline-variant rounded-lg px-md py-sm focus:border-primary focus:ring-0" placeholder="0.00" type="text"/>
+</div>
+</div>
+<div class="px-lg py-md border-t border-outline-variant bg-surface-bright flex justify-end gap-md">
+<button class="px-lg py-sm border border-outline-variant rounded-lg text-on-surface-variant font-label-md hover:bg-surface-container-low transition-colors" onclick="document.getElementById('addModal').classList.add('hidden')">Cancel</button>
+<button class="px-lg py-sm bg-[#0D9488] text-white rounded-lg font-label-md hover:opacity-90 transition-opacity" onclick="this.innerHTML='Registering...'; setTimeout(() =&gt; { document.getElementById('addModal').classList.add('hidden'); this.innerHTML='Save vehicle' }, 1000)">Save vehicle</button>
+</div>
+</div>
+</div>
+<script>
+        // Simple micro-interaction for rows
+        document.querySelectorAll('tbody tr').forEach(row => {
+            row.addEventListener('mousedown', function() {
+                this.classList.add('scale-[0.99]');
+            });
+            row.addEventListener('mouseup', function() {
+                this.classList.remove('scale-[0.99]');
+            });
+        });
+    </script>
+</body></html>
