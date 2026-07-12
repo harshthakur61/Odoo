@@ -101,35 +101,42 @@ const Login = () => {
               <div className="flex flex-wrap gap-2">
                 <button 
                   type="button" 
-                  onClick={() => { setEmail('admin@transitops.com'); setPassword('password123'); }}
+                  onClick={() => { setEmail('admin@transitops.com'); setPassword('demo'); }}
                   className="px-3 py-1 bg-surface-container-low border border-outline-variant rounded text-label-sm hover:bg-surface-container transition-colors"
                 >
                   Fleet Manager
                 </button>
                 <button 
                   type="button" 
-                  onClick={() => { setEmail('dispatcher@transitops.com'); setPassword('password123'); }}
+                  onClick={() => { setEmail('dispatcher@transitops.com'); setPassword('demo'); }}
                   className="px-3 py-1 bg-surface-container-low border border-outline-variant rounded text-label-sm hover:bg-surface-container transition-colors"
                 >
                   Dispatcher
                 </button>
                 <button 
                   type="button" 
-                  onClick={() => { setEmail('field@transitops.com'); setPassword('password123'); }}
+                  onClick={() => { setEmail('field@transitops.com'); setPassword('demo'); }}
                   className="px-3 py-1 bg-surface-container-low border border-outline-variant rounded text-label-sm hover:bg-surface-container transition-colors"
                 >
                   Field Driver
                 </button>
                 <button 
                   type="button" 
-                  onClick={() => { setEmail('safety@transitops.com'); setPassword('password123'); }}
+                  onClick={() => { setEmail('akashthakre1320@gmail.com'); setPassword('demo'); }}
+                  className="px-3 py-1 bg-surface-container-low border border-outline-variant rounded text-label-sm hover:bg-surface-container transition-colors"
+                >
+                  Akash Thakur
+                </button>
+                <button 
+                  type="button" 
+                  onClick={() => { setEmail('safety@transitops.com'); setPassword('demo'); }}
                   className="px-3 py-1 bg-surface-container-low border border-outline-variant rounded text-label-sm hover:bg-surface-container transition-colors"
                 >
                   Safety Officer
                 </button>
                 <button 
                   type="button" 
-                  onClick={() => { setEmail('finance@transitops.com'); setPassword('password123'); }}
+                  onClick={() => { setEmail('finance@transitops.com'); setPassword('demo'); }}
                   className="px-3 py-1 bg-surface-container-low border border-outline-variant rounded text-label-sm hover:bg-surface-container transition-colors"
                 >
                   Financial Analyst
